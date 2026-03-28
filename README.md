@@ -1,18 +1,18 @@
 # AI PRD 工作空间
 
-> 为产品经理打造的高效AI IDE工作空间，支持PRD撰写、字段清单整理、前端Demo生成和业务分析等日常工作。
+> 为产品经理打造的高效 AI IDE 工作空间，基于 Claude Code，支持 PRD 撰写、需求分析、原型生成和业务分析等日常工作。
 
 ---
 
-## 项目简介
+## 前提条件
 
-本项目旨在帮助产品经理利用AI IDE提升工作效率，通过标准化的工作流程、可复用的AI技能包和完整的知识沉淀，实现从需求洞察到规格输出的全流程支持。
+本工作空间基于 **Claude Code** 运行，使用前请先安装：
 
-**核心能力**：
-- 📋 **需求洞察**：深入理解业务需求，确保方向正确
-- 🏗️ **方案架构**：将需求转化为可执行的产品方案
-- 📝 **规格生成**：输出标准化的PRD、字段清单等交付物
-- 📊 **业务分析**：数据分析、流程推演、影响范围分析
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+安装完成后，在本项目根目录打开终端，运行 `claude` 即可启动。
 
 ---
 
@@ -20,38 +20,19 @@
 
 ```
 AI PRD/
-├── .agent/                    # AI配置中心（核心）
-│   ├── rules/                 # 项目规则
-│   ├── skills/                # AI技能包
-│   └── workflows/             # 工作流
-│       ├── 1-analyze-requirement.md   # 需求洞察
-│       ├── 2-design-solution.md       # 方案架构
-│       └── 3-generate-specs.md        # 规格生成
-├── analysis/                  # 业务分析区
-│   ├── data-analysis/         # 数据分析
-│   ├── process-simulation/    # 流程推演
-│   └── scope-analysis/        # 影响范围分析
-├── assets/                    # 资源文件库
-│   ├── images/                # 图片素材
-│   ├── icons/                 # 图标
-│   ├── mockups/               # 原型图、设计稿
-│   └── diagrams/              # 流程图、架构图源文件
-├── context/                   # 项目上下文
+├── .claude/                   # Claude Code 配置中心（核心）
+│   ├── commands/              # 斜杠命令（/new-prd、/prd-qa 等）
+│   └── skills/                # AI 技能包（jobs-to-be-done、user-story 等）
+├── analysis/                  # 业务分析产物
+├── assets/                    # 图片、原型图、流程图等资源
+├── context/                   # 项目上下文（用户画像、产品策略）
 ├── docs/                      # 参考文档库
-│   ├── 01-reference/          # 参考资料
-│   └── 02-other-docs/         # 其他文档
-├── drafts/                    # 草稿区
-│   └── archive/               # 归档
-├── outputs/                   # 最终交付物
-│   ├── client-prds/           # 对外交付的PRD
-│   ├── presentations/         # 汇报演示材料
-│   ├── handoff-docs/          # 交接文档
-│   └── archive/               # 归档
-├── prds/                      # 正式PRD输出区
-│   └── archive/               # 归档
-├── prompts/                   # 提示词库
-├── templates/                 # 模板库
-├── AGENT.md                   # 全局知识库（核心）
+├── drafts/                    # AI 协作草稿区（过程产物）
+├── outputs/                   # 最终对外交付物
+├── prds/                      # 正式 PRD（唯一权威来源）
+│   └── _registry.md           # PRD 索引（AI 首先读这里）
+├── templates/                 # 文档模板库
+├── CLAUDE.md                  # 全局知识库（AI 自动加载）
 └── README.md                  # 本文件
 ```
 
@@ -59,84 +40,99 @@ AI PRD/
 
 ## 快速开始
 
-### 1. 了解核心配置
+### 第一步：了解两个核心文件
 
-- **AGENT.md**：全局知识库，AI助手会优先参考此文件
-- **.agent/workflows/**：三个核心工作流，按顺序执行
+- **`CLAUDE.md`**：全局知识库，AI 每次对话自动加载，记录了所有规范和命令说明
+- **`prds/_registry.md`**：PRD 索引，记录了所有正式需求的路径和状态
 
-### 2. 执行标准工作流
+### 第二步：从一个新需求开始
 
 ```
-Phase 1: 需求洞察 → Phase 2: 方案架构 → Phase 3: 规格生成
+1. 启动 Claude Code，在对话中输入：
+
+   /requirement-clarifier 我想做一个用户登录功能
+
+2. AI 会帮你澄清需求，确认后再创建 PRD：
+
+   /new-prd feature 用户登录
+
+3. 填写生成的 prd.md 文件内容
+
+4. 需要对齐时输出摘要：
+
+   /prd-summary
+
+5. 需求变更时更新（自动存档旧版本）：
+
+   /update-prd 增加了手机号登录方式
 ```
 
-| 阶段 | 工作流 | 输出 |
-|------|--------|------|
-| Phase 1 | `1-analyze-requirement.md` | 需求分析报告 |
-| Phase 2 | `2-design-solution.md` | 方案设计文档 |
-| Phase 3 | `3-generate-specs.md` | PRD、字段清单 |
+---
 
-### 3. 管理工作产出
+## 斜杠命令速查
 
-- **草稿阶段**：在 `drafts/` 中快速迭代
-- **正式文档**：成熟后移至 `prds/`
-- **对外交付**：最终版本放入 `outputs/`
+### PRD 生命周期
+
+| 命令 | 用途 |
+|------|------|
+| `/new-prd [story-card\|feature\|epic] [标题]` | 新建 PRD，自动创建文件夹和注册 |
+| `/update-prd [变更描述]` | 更新 PRD，自动归档旧版本并写 changelog |
+| `/prd-summary` | 输出 PRD 对齐摘要，适合评审前使用 |
+| `/prd-qa [问题]` | 基于 PRD 回答问题（产品/研发/测试均可用） |
+| `/generate-prototype` | 从 PRD 生成可交互 HTML 原型 |
+
+### 需求分析
+
+| 命令 | 用途 |
+|------|------|
+| `/requirement-clarifier [需求描述]` | 识别真实问题，生成需求诊断卡片 |
+| `/analyze-requirement [需求描述]` | 深度需求分析，输出分析报告 |
+| `/design-solution` | 基于分析报告输出方案设计文档 |
+| `/write-user-story [需求描述]` | 生成 Gherkin 格式用户故事 |
+| `/design-data-model [业务场景]` | 生成企业级数据库 Schema |
+
+---
+
+## PRD 三层体系
+
+根据需求规模选择对应类型：
+
+| 类型 | 命令参数 | 适用场景 | 模板 |
+|------|---------|----------|------|
+| 用户故事卡 | `story-card` | 单场景小需求 | `templates/story-card.md` |
+| 功能 PRD | `feature` | 一个完整功能模块 | `templates/feature-prd.md` |
+| 史诗 PRD | `epic` | 大型项目，含多个功能 | `templates/epic-prd.md` |
+
+---
+
+## 标准工作流
+
+```
+新需求
+  → /requirement-clarifier    # 澄清真实问题
+  → /new-prd [type] [标题]    # 创建 PRD 文件结构
+  → 填写 prd.md               # 按模板撰写内容
+  → /prd-summary              # 对齐评审
+  → /update-prd [变更描述]    # 评审后更新（自动存档）
+  → /generate-prototype       # 按需生成原型
+```
 
 ---
 
 ## 文件夹说明
 
-### 核心配置（强制推荐）
-
-| 文件夹 | 用途 | 重要性 |
-|--------|------|--------|
-| `.agent/` | AI配置中心，包含规则、技能、工作流 | ⭐⭐⭐ |
-| `AGENT.md` | 全局知识库，记录项目演进和最佳实践 | ⭐⭐⭐ |
-
-### 工作区域（建议创建）
-
 | 文件夹 | 用途 |
 |--------|------|
-| `analysis/` | 业务分析，包括数据分析、流程推演、影响范围分析 |
-| `assets/` | 资源文件，统一管理图片、原型图、流程图等 |
-| `context/` | 项目上下文，存放项目背景、目标用户等信息 |
-| `docs/` | 参考文档库，存放参考资料和其他文档 |
-| `drafts/` | 草稿区，AI生成的初稿、快速记录、试错迭代 |
-| `outputs/` | 最终交付物，对外交付的PRD、演示材料、交接文档 |
-| `prds/` | 正式PRD输出区 |
-| `prompts/` | 提示词库，沉淀有效的提示词 |
-| `templates/` | 模板库，PRD模板、字段清单模板等 |
-
----
-
-## 使用技巧
-
-### AI协作技巧
-
-1. **明确上下文**：在 `context/` 中维护项目背景信息
-2. **复用提示词**：在 `prompts/` 中沉淀有效的提示词
-3. **遵循工作流**：按照三个Phase顺序执行，确保质量
-
-### 文件管理技巧
-
-1. **命名规范**：使用 `[模块名]-[内容描述]-[版本号]` 格式
-2. **版本管理**：重要文档保留历史版本
-3. **定期归档**：将过期内容移至 `archive/` 子文件夹
-
-### 高效工作技巧
-
-1. **先洞察后设计**：不要急于写PRD，先完成需求洞察
-2. **草稿先行**：在 `drafts/` 中快速迭代，成熟后再正式化
-3. **持续更新**：及时更新 `AGENT.md` 中的经验教训
-
----
-
-## 注意事项
-
-1. **`.agent/` 和 `AGENT.md` 是核心**：这两个是强制推荐的核心配置
-2. **其他文件夹灵活可选**：可根据实际需求调整
-3. **命名自由**：除核心配置外，其他文件夹可使用中文或自定义名称
-4. **按需扩展**：`.agent/rules/` 和 `.agent/skills/` 可根据需要逐步添加
+| `.claude/commands/` | 斜杠命令定义，Claude Code 自动识别 |
+| `.claude/skills/` | 技能规格文档，供命令引用 |
+| `prds/` | 正式 PRD，每个需求一个子文件夹，`prd.md` 是唯一有效版本 |
+| `drafts/` | 草稿区，AI 生成的初稿和试错过程 |
+| `outputs/` | 最终对外交付物（PRD、演示材料、交接文档） |
+| `analysis/` | 业务分析产物（需求分析报告、流程推演等） |
+| `context/` | 项目上下文（用户画像、产品策略、背景） |
+| `templates/` | 文档模板，新建 PRD 时自动使用 |
+| `assets/` | 图片、原型图、流程图等资源文件 |
+| `prompts/` | 有效提示词沉淀 |
 
 ---
 
@@ -144,8 +140,5 @@ Phase 1: 需求洞察 → Phase 2: 方案架构 → Phase 3: 规格生成
 
 | 日期 | 版本 | 更新内容 |
 |------|------|----------|
-| 2026-02-27 | v1.0 | 项目初始化，创建完整结构 |
-
----
-
-> **提示**：本工作空间的核心是 `.agent/` 配置和 `AGENT.md` 知识库。请根据实际工作习惯和项目特点进行调整和定制。
+| 2026-02-27 | v1.0 | ��目初始化 |
+| 2026-03-28 | v2.0 | 迁移至 Claude Code，重构为斜杠命令体系，更新 README |
