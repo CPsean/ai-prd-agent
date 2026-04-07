@@ -8,15 +8,14 @@
 
 **项目名称**：AI PRD 工作空间
 
-**产品类型**：To B SaaS / 平台产品 —— 签署 ePaaS（电子签署平台即服务）
+**产品类型**：（请填写你的产品类型，例如：To B SaaS / 消费类 App / 平台产品）
 
 **项目目标**：为产品经理打造基于 Claude Code 的高效工作空间，支持 PRD 撰写、字段清单整理、原型生成和业务分析等日常工作。AI 作为团队成员之一，可被产品、研发、测试共同使用。
 
-**产品上下文文件**（涉及业务需求时必须参考）：
-- `context/product-background.md`：产品定位、三条产品线（国内站/国际站/混合云天印）
+**产品上下文文件**（涉及业务需求时必须参考，首次使用时通过 README Step 1 建立）：
+- `context/product-background.md`：产品定位、产品线、核心架构和业务术语
 - `context/product-strategy.md`：迭代原则、优先级矩阵、边界约束
-- `context/domain-model-envelope.md`：Envelope 域领域模型（写字段清单/接口时直接引用字段名）
-- `context/iteration-requirement-list.md`：历史迭代需求清单（219条已完成需求索引，含需求类型/产品线/关联PRD）
+- `context/user-persona.md`：用户角色、核心目标、痛点和使用场景
 
 ---
 
@@ -214,6 +213,4 @@ has-prototype: false
 
 | 日期 | 事件 |
 |------|------|
-| 2026-02-27 | 项目初始化（Trae IDE，.agent 结构） |
-| 2026-03-28 | 迁移至 Claude Code：`.claude/` 目录 + `CLAUDE.md` + 斜杠命令体系 |
-| 2026-03-28 | 重构 PRD 工作流：三层模板 + 版本管理 + `_registry.md` + 原型生成命令 |
+| （首次使用时填写） | 项目初始化 |
