@@ -242,29 +242,14 @@ Mini example excerpt:
 ## References
 
 ### Related Skills
-- `skills/user-story-splitting/SKILL.md` — How to break large stories into smaller ones
-- `skills/proto-persona/SKILL.md` — Defines the "As a [persona]" section
-- `skills/problem-statement/SKILL.md` — Stories should address validated problems
-- `skills/epic-hypothesis/SKILL.md` — Epics decompose into user stories
-
-### Optional Helpers
-- `skills/user-story/scripts/user-story-template.py` — Deterministic Markdown stub generator (no network access)
+- `skills/requirement-clarifier.md` — 用户故事前先澄清真实问题
+- `skills/ingest-prd.md` — 录入历史PRD时，用户故事是必填章节之一
 
 ### External Frameworks
 - Mike Cohn, *User Stories Applied* (2004) — Origin of the "As a / I want / so that" format
 - Gherkin (Cucumber) — "Given/When/Then" acceptance criteria format
 - INVEST criteria (Independent, Negotiable, Valuable, Estimable, Small, Testable)
 
-### Dean's Work
-- [Link to relevant Dean Peters' Substack articles if applicable]
-
-### Provenance
-- Adapted from `prompts/user-story-prompt-template.md` in the `https://github.com/deanpeters/product-manager-prompts` repo.
-
 ---
 
 **Skill type:** Component
-**Suggested filename:** `user-story.md`
-**Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/proto-persona/SKILL.md`, `skills/problem-statement/SKILL.md`
-**Used by:** `skills/user-story-splitting/SKILL.md`, `skills/epic-hypothesis/SKILL.md`

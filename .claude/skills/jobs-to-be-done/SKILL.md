@@ -344,25 +344,13 @@ Mini example excerpt:
 ## References
 
 ### Related Skills
-- `skills/proto-persona/SKILL.md` — Defines who has these jobs/pains/gains
-- `skills/problem-statement/SKILL.md` — JTBD informs the "Trying to" and "But" sections
-- `skills/positioning-statement/SKILL.md` — JTBD informs the "that need" statement
+- `skills/requirement-clarifier.md` — JTBD 分析后，用此 skill 评估具体需求是否解决了正确的问题
 
 ### External Frameworks
 - Clayton Christensen, *Competing Against Luck* (2016) — Origin of Jobs-to-be-Done theory
 - Tony Ulwick, *Outcome-Driven Innovation* (2016) — Quantifying jobs and outcomes
 - Alexander Osterwalder, *Value Proposition Canvas* (2014) — Customer jobs/pains/gains framework
 
-### Dean's Work
-- [Link to relevant Dean Peters' Substack articles if applicable]
-
-### Provenance
-- Adapted from `prompts/jobs-to-be-done.md` in the `https://github.com/deanpeters/product-manager-prompts` repo.
-
 ---
 
 **Skill type:** Component
-**Suggested filename:** `jobs-to-be-done.md`
-**Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/proto-persona/SKILL.md`
-**Used by:** `skills/positioning-statement/SKILL.md`, `skills/problem-statement/SKILL.md`, `skills/epic-hypothesis/SKILL.md`

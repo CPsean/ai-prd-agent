@@ -470,34 +470,15 @@ Later: Mobile workflows (DAU lift)
 
 ### Related Skills (Orchestrated by This Workflow)
 
-**Phase 2:**
-- `skills/epic-hypothesis/SKILL.md` (component)
-
-**Phase 3:**
-- `skills/prioritization-advisor/SKILL.md` (interactive)
-
-**Phase 4:**
-- (Dependencies mapped manually, no specific skill)
-
-**Phase 5:**
-- (Presentation created manually, no specific skill)
-
-**Optional/Related:**
-- `skills/product-strategy-session/SKILL.md` (workflow) — Run before roadmap planning to establish strategy
-- `skills/discovery-process/SKILL.md` (workflow) — Provides customer problem inputs for Phase 1
-- `skills/user-story-mapping-workshop/SKILL.md` (interactive) — For complex epics requiring release planning
+- `skills/jobs-to-be-done/SKILL.md` — Phase 1 客户问题输入来源
+- `skills/requirement-clarifier.md` — 单个需求澄清
+- `skills/user-story/SKILL.md` — Phase 2 Epic 分解为用户故事
 
 ### External Frameworks
 - Bruce McCarthy, *Product Roadmaps Relaunched* (2017) — Outcome-driven roadmaps
 - C. Todd Lombardo, *Product Roadmaps Relaunched* (2017) — Now/Next/Later framework
 - Intercom, "RICE Prioritization" (2016) — Prioritization framework
 
-### Dean's Work
-- [If Dean has roadmap planning resources, link here]
-
 ---
 
 **Skill type:** Workflow
-**Suggested filename:** `roadmap-planning.md`
-**Suggested placement:** `/skills/workflows/`
-**Dependencies:** Orchestrates `skills/epic-hypothesis/SKILL.md`, `skills/prioritization-advisor/SKILL.md`, plus manual activities
