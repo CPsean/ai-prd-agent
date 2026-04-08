@@ -94,7 +94,7 @@ created: [需求清单中的上线日期]
 updated: [今天日期]
 author: [负责人，从需求清单取]
 feature-area: [从需求名称/标签推断]
-product-line: [国内站|国际站|国内站,国际站|内部产品优化|待确认]
+product-line: ""   # 从 context/product-background.md 读取产品线列表，留空表示待确认
 req-ids: [[需求ID1, 需求ID2]]   # 未找到匹配时置为 []
 prev-req-ids: []                # 历史版本对应的需求ID（多版本文档时填写）
 epic: [所属 Epic ID，无则留空]
@@ -188,17 +188,19 @@ Q2 [类别] 问题描述
 
 ## 产品线推断规则
 
-当需求在清单中标注为「未标注」时，依据以下关键词推断：
+> **产品线由用户在 `context/product-background.md` 中定义和维护，不在此文件中硬编码。**
 
-| 关键词 | 推断产品线 |
-|--------|-----------|
-| 国际站、eSignGlobal、香港、VIDA、VNPT、iamsmart、Adobe、多语言支持 | 国际站 |
-| 国内站、支付宝、微信、钉钉、C2B、C2C、融合项目 | 国内站 |
-| 灰度、埋点、稳定性、兼容性测试、性能优化、审计日志 | 内部产品优化 |
-| 同时含国内+国际关键词 | 国内站,国际站 |
+执行时：
+
+1. 读取 `context/product-background.md`，找到产品线定义及其关键词/标签
+2. 根据 PRD 内容与产品线描述进行匹配推断
+3. 若 `context/product-background.md` 尚未填写产品线信息，`product-line` 置空，在缺口问题中提示用户先完善上下文
 
 推断后在缺口问题 Q1 列出确认，格式：
 `Q1 [产品线] 根据关键词「xxx」推断为「xxx」，请确认或更正`
+
+若上下文文件未初始化，格式：
+`Q1 [产品线] context/product-background.md 中暂无产品线定义，请补充后重新执行，或手动指定本PRD的产品线`
 
 ---
 

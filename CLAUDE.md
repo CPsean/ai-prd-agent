@@ -16,6 +16,8 @@
 - `context/product-background.md`：产品定位、产品线、核心架构和业务术语
 - `context/product-strategy.md`：迭代原则、优先级矩阵、边界约束
 - `context/user-persona.md`：用户角色、核心目标、痛点和使用场景
+- `context/permission-model.md`：权限模型类型（RBAC/ABAC/PBAC）及角色定义，撰写 PRD 权限控制章节时读取
+- `context/platform-support.md`：产品支持的端清单及各端约束（由用户自行维护，模板中的端列表仅为示例），撰写 PRD 端差异说明章节时读取
 
 ---
 
@@ -157,7 +159,26 @@ has-prototype: false
 | `outputs/` | 最终对外交付物 |
 | `prds/` | 正式 PRD（唯一权威来源） |
 | `prompts/` | 有效提示词沉淀 |
+| `evals/` | 测试用例集（命令行为测试、质检规则验证） |
+| `examples/` | 示例库（高质量案例、反面案例、skill 输出样本） |
+| `rules/` | 约束性规则（质量门禁、业务规则库、术语规范） |
 | `templates/` | 文档模板库 |
+
+### examples/ AI 读取规则
+
+| 文件/目录 | 何时读取 |
+|-----------|----------|
+| `examples/good-prd/` | 生成或完整审查 PRD 内容时，对齐表达精度和完整度 |
+| `examples/anti-patterns/prd-anti-patterns.md` | 执行质检时，识别模糊表达和不完整结构的根因 |
+| `examples/skill-outputs/` | 执行对应 skill 时，对齐输出格式和信息密度 |
+
+### rules/ AI 读取规则
+
+| 文件 | 何时读取 |
+|------|----------|
+| `rules/prd-quality-gates.md` | 执行 `/prd-summary`、`/update-prd` 时，在输出末尾自动进行质检 |
+| `rules/business-rules.md` | 撰写或审查 PRD 业务规则章节时，优先检查是否有可复用的全局规则 |
+| `rules/terminology.md` | 生成任何 PRD 内容时，术语以此文件为准；用户输入与此不一致时，输出时统一转换 |
 
 ---
 
