@@ -18,6 +18,7 @@
 - `context/user-persona.md`：用户角色、核心目标、痛点和使用场景
 - `context/permission-model.md`：权限模型类型（RBAC/ABAC/PBAC）及角色定义，撰写 PRD 权限控制章节时读取
 - `context/platform-support.md`：产品支持的端清单及各端约束（由用户自行维护，模板中的端列表仅为示例），撰写 PRD 端差异说明章节时读取
+- `context/iteration-requirement-list.md`：历史迭代需求汇总表（可选），供 `/ingest-prd` 匹配需求 ID；文件不存在时跳过，不影响其他功能
 
 ---
 
@@ -29,10 +30,10 @@
 |------|------|----------|
 | `/new-prd [story-card\|feature\|epic] [标题]` | 新建 PRD，自动创建文件夹、文件和注册 | 有新需求时第一步 |
 | `/ingest-prd` | 录入历史PRD，自动重建结构、更新注册表和需求清单，输出缺口问题 | 历史需求归档 |
-| `/update-prd [变更描述]` | 更新 PRD + 自动归档旧版本 + 写 changelog | 评审后需求变更 |
-| `/generate-prototype` | 从 PRD 生成 HTML 可交互原型 | 需要对齐界面结构时 |
+| `/update-prd [标题] [变更描述]` | 更新 PRD + 自动归档旧版本 + 写 changelog | 评审后需求变更 |
+| `/generate-prototype [标题]` | 从 PRD 生成 HTML 可交互原型 | 需要对齐界面结构时 |
 | `/prd-qa [问题]` | 基于 PRD 回答具体问题（产品/研发/测试均可问） | 开发过程中的疑问 |
-| `/prd-summary` | 输出 PRD 的对齐摘要 | 评审前、开发启动前 |
+| `/prd-summary [标题或ID]` | 输出 PRD 的对齐摘要 | 评审前、开发启动前 |
 
 ### 需求分析命令
 
@@ -98,15 +99,25 @@
 
 ### PRD 目录结构
 
+PRD 初稿先在 `drafts/`，用户确认后移入 `prds/`：
+
 ```
-prds/
+drafts/                       ← 第一步：/new-prd 在此创建草稿
+  [需求中文标题]/
+    prd.md                    ← 草稿内容（待确认，不可被 prd-qa/prd-summary 读取）
+    CHANGELOG.md
+    archive/
+
+        ↓ 用户说「确认 [标题] PRD 移入正式区」
+
+prds/                         ← 第二步：确认后移入，注册生效
   _registry.md                ← AI 首先读这里，找到对应 PRD 路径
   [需求中文标题]/
     prd.md                    ← 当前有效版本（AI 主要消费此文件）
     CHANGELOG.md              ← 变更记录（不作为主要参考）
     fields.md                 ← 字段清单（Feature/Epic 级别）
     prototype/
-      index.html              ← 可交互 HTML 原型（按需生成）
+      index.html              ← 可交互 HTML 原型（按需生成，需已在正式区）
     archive/
       prd-v1.0.md             ← 历史快照（禁止修改）
   archive/                    ← 整体归档（需求废弃或完工）
@@ -155,9 +166,9 @@ has-prototype: false
 | `assets/` | 图片、原型图、流程图等资源文件 |
 | `context/` | 项目上下文（用户画像、产品策略、背景） |
 | `docs/` | 参考文档库 |
-| `drafts/` | AI 协作草稿区（过程产物） |
-| `outputs/` | 最终对外交付物 |
-| `prds/` | 正式 PRD（唯一权威来源） |
+| `drafts/` | 草稿暂存区：PRD 初稿（待用户确认）+ 方案设计文档 |
+| `outputs/` | 对外交付物（演示材料、交接文档等，PRD 不在此） |
+| `prds/` | 正式 PRD（唯一权威来源，用户确认后从 drafts/ 移入） |
 | `prompts/` | 有效提示词沉淀 |
 | `evals/` | 测试用例集（命令行为测试、质检规则验证） |
 | `examples/` | 示例库（高质量案例、反面案例、skill 输出样本） |
@@ -188,14 +199,15 @@ has-prototype: false
 
 ```
 新需求
-  → /requirement-clarifier    （澄清真实问题，生成 RDD）
-  → /new-prd [type] [标题]    （创建 PRD 文件结构）
-  → 填写 prd.md               （按模板撰写内容）
-  → /prd-summary              （对齐评审）
+  → /requirement-clarifier [需求描述]     （澄清真实问题，生成 RDD）
+  → /new-prd [type] [标题]               （草稿创建在 drafts/）
+  → 填写 prd.md                          （告诉 AI 需求细节 或 手动编辑）
+  → 「确认 [标题] PRD 移入正式区」         （移入 prds/，注册）
+  → /prd-summary [标题或ID]              （对齐评审）
   → 评审发现问题
-  → /update-prd [变更描述]    （更新 + 自动存档）
-  → /generate-prototype       （按需生成原型）
-  → 状态改为 approved → released
+  → /update-prd [标题] [变更描述]         （更新 + 自动存档）
+  → /generate-prototype [标题]            （按需生成原型，需已在正式区）
+  → 用 /update-prd 将 status 改为 approved → released
 ```
 
 ### 字段清单标准
@@ -208,14 +220,27 @@ has-prototype: false
 - 复杂需求（多页面/需对齐界面）：运行 `/generate-prototype`
 - 原型页面与 PRD "页面 & 交互说明"章节一一对应
 
+### 命令变更规范
+
+任何斜杠命令的新增或修改，必须同步更新以下三个文件（"三件套"）：
+
+| 文件 | 作用 | 不更新的后果 |
+|------|------|-------------|
+| `.claude/commands/xxx.md` | 命令行为定义 | AI 执行逻辑与预期不符 |
+| `CLAUDE.md` 速查表 + 目录结构 + 工作流 | AI 和用户的认知对齐 | 参数格式、流程描述与实际行为矛盾 |
+| `evals/commands/TC-xxx.md` | 行为验证基准 | 测试通过但验证的是错误行为 |
+
+**三者不一致 = 变更未完成。** AI 在修改命令定义后，应主动检查并同步另外两个文件。
+
 ---
 
 ## 最佳实践
 
 1. 模糊需求先过 `/requirement-clarifier`，再建 PRD
 2. PRD 只有一个权威文件（`prd.md`），不要在外部复制维护
-3. 研发/测试有疑问时直接用 `/prd-qa` 问 AI，而非口头询问
-4. 每次需求变更用 `/update-prd`，不要直接编辑 `prd.md` 而不留记录
+3. 研发/测试有疑问时直接用 `/prd-qa` 问 AI，而非口头询问（仅限正式区 PRD）
+4. 每次需求变更用 `/update-prd [标题] [变更描述]`，不要直接编辑 `prd.md` 而不留记录
+5. PRD 草稿完成后及时确认移入正式区，避免草稿区积压未发布内容
 
 ---
 
@@ -227,6 +252,7 @@ has-prototype: false
 | 版本混乱 | 所有变更通过 `/update-prd`，禁止直接覆盖 |
 | 研发对需求有疑问 | 用 `/prd-qa` 基于 PRD 回答，发现缺陷及时补充 |
 | 输出不一致 | 使用标准化斜杠命令，不自由发挥提示词 |
+| 命令改了但速查表/测试没同步 | 命令变更必须同步三件套（见命令变更规范） |
 
 ---
 

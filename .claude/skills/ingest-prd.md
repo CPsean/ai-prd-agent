@@ -25,11 +25,19 @@ version: "2.0"
 
 执行前必须实际读取以下文件（不得使用记忆中的数据）：
 
-1. `prds/_registry.md` — 确认当前最高 ID 编号，避免 ID 冲突
-2. `context/iteration-requirement-list.md` — 匹配需求ID，获取上线时间/优先级/负责人
-3. `context/product-background.md` — 辅助推断产品线
+1. `prds/_registry.md` — 确认当前最高 ID 编号，避免 ID 冲突（**必读**，失败则停止执行）
+2. `context/iteration-requirement-list.md` — 匹配需求ID，获取上线时间/优先级/负责人（**可选**，见下方说明）
+3. `context/product-background.md` — 辅助推断产品线（**可选**，缺失时跳过）
 
-> **路径注意**：工作目录为项目根目录，上述路径均为相对路径。若读取失败，先用 Glob 确认实际路径再重试，不得跳过。
+**关于 `iteration-requirement-list.md` 缺失的处理**：
+- 文件存在 → 正常读取，用于 Step 0.5 的需求ID匹配
+- 文件不存在或为空模板（只有表头/示例行）→ 输出以下提示后继续执行，所有需求按「情况C」处理：
+
+> ⚠️ 未找到需求列表（`context/iteration-requirement-list.md`）。
+> 建议先按 README Step 1.5 补充历史需求列表，可提升 ID 匹配准确率。
+> 本次将跳过 ID 自动匹配，所有需求 ID 需手动确认。
+
+> **路径注意**：工作目录为项目根目录，上述路径均为相对路径。
 
 ---
 

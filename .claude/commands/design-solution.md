@@ -29,4 +29,6 @@ $ARGUMENTS
 
 生成方案设计文档，存至 `drafts/` 目录，文件名：`YYYY-MM-DD-[需求名称]-solution.md`
 
-完成后进入 Phase 3：运行 `/generate-specs`
+完成后可进入下一步：
+- 运行 `/new-prd feature [标题]` 创建正式 PRD，将方案文档作为填写依据
+- 或运行 `/write-user-story [需求描述]` 生成开发可交付的用户故事

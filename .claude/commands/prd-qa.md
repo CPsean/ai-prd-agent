@@ -20,6 +20,8 @@ $ARGUMENTS
 - `$ARGUMENTS` 中包含功能名称关键词 → 查 `prds/_registry.md` 匹配标题，读取对应 `prd.md`
 - 未指定 → 询问用户"请问是关于哪个功能的问题？"
 
+**只读 `prds/` 中已注册的正式 PRD，不读 `drafts/` 中的草稿。** 若用户询问的 PRD 仍在草稿区，告知："该 PRD 尚未移入正式区，请先确认发布后再使用 `/prd-qa`。"
+
 **2. 只读当前版本**
 - 只读 `prd.md`，不读 `archive/` 下的历史文件
 - 如有 `fields.md`，一并读取

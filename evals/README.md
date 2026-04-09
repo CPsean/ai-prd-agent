@@ -10,10 +10,16 @@
 evals/
   commands/               ← 命令行为测试（验证命令是否按预期执行）
     TC-new-prd.md
-    TC-requirement-clarifier.md
-    TC-prd-summary.md
     TC-update-prd.md
     TC-ingest-prd.md
+    TC-prd-summary.md
+    TC-prd-qa.md
+    TC-generate-prototype.md
+    TC-requirement-clarifier.md
+    TC-analyze-requirement.md
+    TC-design-solution.md
+    TC-write-user-story.md
+    TC-design-data-model.md
   quality-gates/          ← 质检规则测试（验证规则能否正确识别问题）
     QG-pass-cases.md
     QG-fail-cases.md
@@ -42,10 +48,16 @@ evals/
 | 前缀 | 含义 |
 |------|------|
 | `TC-NP-` | /new-prd 命令测试 |
-| `TC-RC-` | /requirement-clarifier 命令测试 |
-| `TC-PS-` | /prd-summary 命令测试 |
 | `TC-UP-` | /update-prd 命令测试 |
 | `TC-IP-` | /ingest-prd 命令测试 |
+| `TC-PS-` | /prd-summary 命令测试 |
+| `TC-PQ-` | /prd-qa 命令测试 |
+| `TC-GP-` | /generate-prototype 命令测试 |
+| `TC-RC-` | /requirement-clarifier 命令测试 |
+| `TC-AR-` | /analyze-requirement 命令测试 |
+| `TC-DS-` | /design-solution 命��测试 |
+| `TC-WS-` | /write-user-story 命令测试 |
+| `TC-DM-` | /design-data-model 命令测试 |
 | `QG-P-` | 质检通过用例 |
 | `QG-F-` | 质检失败用例（预期触发特定质检项） |
 
