@@ -111,3 +111,77 @@
 - [ ] 第一轮输出仅包含规划清单，不包含代码
 - [ ] 规划清单中的页面与 PRD "页面 & 交互说明"章节一一对应
 - [ ] AI 明确询问"确认后开始生成"
+
+---
+
+## TC-GP-05 有 page-spec.md 时优先以其为输入
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | ✅ 2026-04-10 |
+| **测试目标** | 验证 page-spec.md 存在时，AI 优先读取 page-spec 而非 PRD 的"页面 & 交互说明"章节 |
+| **前置条件** | `prds/消息推送设置/prd.md` 存在，`prds/消息推送设置/page-spec.md` 存在（由 TC-GPS-01 生成） |
+
+**测试输入**
+```
+/generate-prototype 消息推送设置
+```
+
+**预期行为**
+1. 检查 `prds/消息推送设置/page-spec.md` 存在
+2. 以 page-spec.md 为主要输入（页面列表、区块结构、状态、操作说明）
+3. 生成的原型 `<head>` 注释中 `generated-from-page-spec` 填写 page-spec 的 `source-prd-version`
+4. **不**需要提示"建议先运行 /generate-page-spec"
+
+**检查要点**
+- [ ] AI 输出中未出现"未找到页面规格卡"或"建议先运行 /generate-page-spec"的提示
+- [ ] `prototype/index.html` 的 `<head>` 注释中 `generated-from-page-spec` 字段有值（非 N/A）
+- [ ] 规划清单中的页面结构与 page-spec.md 内容一致（而非仅基于 PRD 推断）
+
+---
+
+## TC-GP-06 无 page-spec.md 时回退 PRD 并提示建议
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | ✅ 2026-04-10 |
+| **测试目标** | 验证无 page-spec 时，AI 回退读取 PRD 并输出"建议先运行 /generate-page-spec"的提示 |
+| **前置条件** | `prds/消息通知设置/prd.md` 存在，无 page-spec.md |
+
+**测试输入**
+```
+/generate-prototype 消息通知设置
+```
+
+**预期行为**
+1. 检查 `prds/消息通知设置/page-spec.md`，不存在
+2. 输出提示：
+   > "未找到页面规格卡，将直接基于 PRD 生成原型。建议先运行 `/generate-page-spec 消息通知设置` 以提升原型准确性。"
+3. 回退读取 `prd.md` 的"页面 & 交互说明"章节，继续执行后续步骤
+4. 生成的原型 `<head>` 注释中 `generated-from-page-spec: N/A`
+
+**检查要点**
+- [ ] AI 输出中包含"未找到页面规格卡"相关提示
+- [ ] 提示中包含 `/generate-page-spec 消息通知设置` 命令
+- [ ] 生成流程未中断，最终仍生成了 `prototype/index.html`
+- [ ] `<head>` 注释中 `generated-from-page-spec: N/A`
+
+---
+
+## TC-GP-07 生成完成后：有关联 page-spec 时提示 /sync-docs
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | ✅ 2026-04-10 |
+| **测试目标** | 验证有 page-spec 时，原型生成完毕后输出 /sync-docs 引导提示 |
+| **前置条件** | `prds/消息推送设置/page-spec.md` 存在，原型已确认生成 |
+
+**预期行为**（步骤 5 输出确认部分）
+- 输出文件路径、页面列表、预览说明
+- 附加提示：
+  > "如后续 PRD 或页面规格有变更，可运行 `/sync-docs 消息推送设置` 检查文档一致性。"
+
+**检查要点**
+- [ ] 输出中包含 `/sync-docs [标题]` 引导
+- [ ] 引导出现在步骤 5 的确认信息末尾（非中途打断）
+- [ ] 无 page-spec 时（TC-GP-06 场景）**不**包含此引导

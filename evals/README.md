@@ -14,7 +14,9 @@ evals/
     TC-ingest-prd.md
     TC-prd-summary.md
     TC-prd-qa.md
+    TC-generate-page-spec.md
     TC-generate-prototype.md
+    TC-sync-docs.md
     TC-requirement-clarifier.md
     TC-analyze-requirement.md
     TC-design-solution.md
@@ -52,7 +54,9 @@ evals/
 | `TC-IP-` | /ingest-prd 命令测试 |
 | `TC-PS-` | /prd-summary 命令测试 |
 | `TC-PQ-` | /prd-qa 命令测试 |
+| `TC-GPS-` | /generate-page-spec 命令测试 |
 | `TC-GP-` | /generate-prototype 命令测试 |
+| `TC-SD-` | /sync-docs 命令测试 |
 | `TC-RC-` | /requirement-clarifier 命令测试 |
 | `TC-AR-` | /analyze-requirement 命令测试 |
 | `TC-DS-` | /design-solution 命��测试 |
