@@ -4,6 +4,33 @@
 
 ---
 
+## 对话开场
+
+**触发条件**：用户输入模糊（无具体命令）、或输入"帮助"/"从哪里开始"/"我该用哪个命令"/"怎么开始"时，展示以下引导菜单。用户携带具体命令时直接执行，不展示菜单。
+
+```
+我可以帮你完成从需求发现到交付物的任意阶段，请选择你的起点：
+
+① 需求还不清晰，先探索真实问题    → /requirement-clarifier [需求描述]
+② 需求明确，直接写新功能 PRD      → /new-prd feature [标题]
+③ 小需求 / 单场景                → /new-prd story-card [标题]
+④ 大型项目 / 多功能规划           → /new-prd epic [标题]
+⑤ 对已有功能做迭代优化            → /new-prd feature [标题]（过程中选迭代模板）
+⑥ 已有 PRD → 生成页面规格卡      → /generate-page-spec [标题]
+⑦ 已有 PRD / 页面规格 → 生成原型  → /generate-prototype [标题]
+⑧ PRD 更新后核查关联文档一致性    → /sync-docs [标题]
+
+直接输入编号或描述你的需求，我来匹配合适的路径。
+```
+
+**意图匹配规则**：
+- 输入编号 → 直接进入对应路径
+- 描述新功能需求 → 询问需求是否清晰，清晰走②，模糊走①
+- 说"改一下 XX 功能"/"优化 XX" → 走⑤
+- 说"画原型"/"做原型" → 判断是否有 PRD，有走⑦，无走①→②→⑦
+
+---
+
 ## 项目简介
 
 **项目名称**：AI PRD 工作空间
@@ -28,10 +55,12 @@
 
 | 命令 | 用途 | 典型场景 |
 |------|------|----------|
-| `/new-prd [story-card\|feature\|epic] [标题]` | 新建 PRD，自动创建文件夹、文件和注册 | 有新需求时第一步 |
+| `/new-prd [story-card\|feature\|iteration\|epic] [标题]` | 新建 PRD，含迭代类型识别和两轮澄清 | 有新需求或迭代优化时 |
 | `/ingest-prd` | 录入历史PRD，自动重建结构、更新注册表和需求清单，输出缺口问题 | 历史需求归档 |
 | `/update-prd [标题] [变更描述]` | 更新 PRD + 自动归档旧版本 + 写 changelog | 评审后需求变更 |
-| `/generate-prototype [标题]` | 从 PRD 生成 HTML 可交互原型 | 需要对齐界面结构时 |
+| `/generate-page-spec [标题]` | 从 PRD 提取页面规格卡（原型生成的前置步骤） | PRD 确认后，生成原型前 |
+| `/generate-prototype [标题]` | 从页面规格卡（优先）或 PRD 生成 HTML 可交互原型 | 需要对齐界面结构时 |
+| `/sync-docs [标题]` | 检查 PRD、页面规格卡、原型的一致性，列出差异和建议操作 | PRD 更新后核查关联文档 |
 | `/prd-qa [问题]` | 基于 PRD 回答具体问题（产品/研发/测试均可问） | 开发过程中的疑问 |
 | `/prd-summary [标题或ID]` | 输出 PRD 的对齐摘要 | 评审前、开发启动前 |
 
@@ -198,15 +227,27 @@ has-prototype: false
 ### 标准工作流
 
 ```
-新需求
-  → /requirement-clarifier [需求描述]     （澄清真实问题，生成 RDD）
-  → /new-prd [type] [标题]               （草稿创建在 drafts/）
-  → 填写 prd.md                          （告诉 AI 需求细节 或 手动编辑）
+新需求（模糊）
+  → /requirement-clarifier [需求描述]     （JTBD 发现真实问题，生成 RDD 卡片）
+  → 自动衔接：/new-prd [标题]            （读取 RDD，跳过需求讨论）
+
+新需求（明确）/ 迭代优化
+  → /new-prd [type] [标题]               （AI 询问新功能 or 迭代，选对应模板）
+
+草稿阶段（两轮澄清）
+  → AI 主动提问：方案细节澄清             （产品视角，≤3问/轮）
+  → AI 判断收敛 → 建议移入正式区
   → 「确认 [标题] PRD 移入正式区」         （移入 prds/，注册）
-  → /prd-summary [标题或ID]              （对齐评审）
-  → 评审发现问题
+  → AI 自动判断是否涉及页面变更
+
+涉及页面变更
+  → /generate-page-spec [标题]            （PRD → 页面规格卡）
+  → /generate-prototype [标题]            （页面规格卡 → 可交互原型）
+
+评审 & 迭代
+  → /prd-summary [标题或ID]              （评审前对齐）
   → /update-prd [标题] [变更描述]         （更新 + 自动存档）
-  → /generate-prototype [标题]            （按需生成原型，需已在正式区）
+  → /sync-docs [标题]                    （检查关联文档一致性）
   → 用 /update-prd 将 status 改为 approved → released
 ```
 
@@ -261,3 +302,8 @@ has-prototype: false
 | 日期 | 事件 |
 |------|------|
 | （首次使用时填写） | 项目初始化 |
+| 2026-04-10 | **串联流水线**：`/requirement-clarifier` 完成后自动保存 RDD 至 `drafts/[标题]/rdd.md` 并引导进入 `/new-prd`；`/new-prd` 新增步骤0（新功能/迭代识别）、步骤5.5（PRD细节两轮澄清，AI自判收敛）、移入正式区后自动判断是否涉及页面变更并引导后续步骤 |
+| 2026-04-10 | **新增命令 `/generate-page-spec`**：PRD → 页面规格卡，作为原型生成的前置中间层，保存至 `prds/[标题]/page-spec.md`，写入 `source-prd-version` 和 `last-updated` 元数据 |
+| 2026-04-10 | **新增命令 `/sync-docs`**：读取 PRD CHANGELOG 与关联文档元数据，比对版本差异，输出潜在不一致清单 + 建议操作；`/update-prd`、`/generate-prototype` 末尾同步加入轻量提示 |
+| 2026-04-10 | **新增模板 `templates/iteration-prd.md`**：迭代类 PRD 精简模板，含 `modifies` 关联字段、变更前→变更后结构、只写变化部分的页面/规则章节；`/new-prd` 步骤0新增迭代类型识别和模板路由 |
+| 2026-04-10 | **对话开场引导**：CLAUDE.md 顶部新增路径选择菜单（8条路径），模糊输入或触发词时展示，命令速查表和标准工作流同步更新 |

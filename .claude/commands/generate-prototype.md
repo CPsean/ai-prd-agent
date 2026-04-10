@@ -12,15 +12,18 @@ $ARGUMENTS
 
 ## 执行步骤
 
-**1. 读取 PRD**
+**1. 读取输入**
 
 **前置检查**：原型只能基于正式区 PRD 生成，不接受草稿。
 
 - 从 `$ARGUMENTS` 中提取标题或 ID
-- 查 `prds/_registry.md` 定位 PRD 路径，读取 `prd.md`
+- 查 `prds/_registry.md` 定位 PRD 路径
 - **未在注册表中找到时**：停止执行，告知用户：
   > "该 PRD 尚未移入正式区（prds/），无法生成原型。请先确认发布后再运行此命令。"
-- 找到后识别"页面 & 交互说明"章节中定义的所有页面，记录每个页面的：名称、元素、交互规则、空/异常状态
+- **优先读取页面规格卡**：检查 `prds/[标题]/page-spec.md` 是否存在
+  - **存在**：以页面规格卡为主要输入，从中提取页面列表、区块结构、状态定义与操作说明
+  - **不存在**：回退读取 `prd.md` 的"页面 & 交互说明"章节，并提示：
+    > "未找到页面规格卡，将直接基于 PRD 生成原型。建议先运行 `/generate-page-spec [标题]` 以提升原型准确性。"
 
 **2. 规划原型结构**
 - 每个 PRD 页面 = 原型中的一个独立 section（id 对应页面名称）
@@ -43,11 +46,25 @@ prototype/
   index.html     ← 所有页面合并在单文件中，通过 JS 切换显示
 ```
 
-**4. 更新 PRD**
-- 将 `prd.md` 的 YAML 中 `has-prototype` 改为 `true`
-- 将 `prototype-path` 改为 `prototype/index.html`
+**4. 更新元数据**
+
+在 `prototype/index.html` 的 `<head>` 标签内插入生成记录注释：
+
+```html
+<!--
+  generated-from-prd-version: [PRD 当前 version]
+  generated-from-page-spec: [page-spec.md 的 source-prd-version，若无则填 N/A]
+  generated-date: [今天日期]
+-->
+```
+
+同步更新 `prd.md` 的 YAML：
+- `has-prototype` 改为 `true`
+- `prototype-path` 改为 `prototype/index.html`
 
 **5. 输出确认**
 - 告知用户原型文件路径
 - 列出生成了哪些页面
 - 提示：直接用浏览器打开 `prototype/index.html` 即可预览
+- 若有关联 page-spec，附加提示：
+  > 如后续 PRD 或页面规格有变更，可运行 `/sync-docs [标题]` 检查文档一致性。
