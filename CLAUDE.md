@@ -40,6 +40,7 @@
 **项目目标**：为产品经理打造基于 Claude Code 的高效工作空间，支持 PRD 撰写、字段清单整理、原型生成和业务分析等日常工作。AI 作为团队成员之一，可被产品、研发、测试共同使用。
 
 **产品上下文文件**（涉及业务需求时必须参考，首次使用时通过 README Step 1 建立）：
+- `context/workspace-config.md`：工作区配置（作者姓名等默认值），首次运行 `/new-prd` 时自动引导创建；**不应提交到公共仓库**
 - `context/product-background.md`：产品定位、产品线、核心架构和业务术语
 - `context/product-strategy.md`：迭代原则、优先级矩阵、边界约束
 - `context/user-persona.md`：用户角色、核心目标、痛点和使用场景

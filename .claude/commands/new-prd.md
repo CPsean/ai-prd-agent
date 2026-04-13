@@ -32,6 +32,21 @@ $ARGUMENTS
 类型直接为 `iteration` 时，视同选 B，直接询问被迭代的原始功能。
 类型为 `story-card` 或 `epic` 时，跳过本步骤。
 
+**0.5 读取作者信息**
+
+检查 `context/workspace-config.md` 是否存在，以及 `author` 字段是否已填写（非占位符 `your-name` 且非空）：
+
+- **已填写**：读取 `author` 字段值，后续步骤中用于填充 YAML frontmatter，静默继续，不打扰用户。
+- **未填写或文件不存在**：在执行任何文件操作前，向用户提示：
+
+  > **首次使用提示：** 请告诉我你的姓名或花名，将自动保存到 `context/workspace-config.md`，之后所有 PRD 的 `author` 字段会自动填写，无需每次手动输入。
+  >
+  > 请输入你的姓名（或回复"跳过"以留空）：
+
+  用户回复后：
+  - 若用户提供了名字：创建或更新 `context/workspace-config.md`，将 `author` 字段设为用户输入的值，然后继续。
+  - 若用户回复"跳过"：`author` 字段留空，继续执行，不再追问。
+
 **1. 确定 ID**
 - 读取 `prds/_registry.md`，找到当前对应类型的最大 ID 编号
 - 新 ID = 最大编号 + 1（格式：SC-001 / F-001 / E-001，三位补零）
@@ -59,6 +74,7 @@ a. `prd.md` — 从对应模板复制：
    - `SC-XXX` / `F-XXX` / `E-XXX` → 新分配的 ID
    - `[标题]` → 用户提供的标题
    - `YYYY-MM-DD` → 今天日期
+   - `author:` → 步骤 0.5 读取到的作者名（如已获取）；若用户选择跳过则留空
 
 b. `CHANGELOG.md` — 内容如下：
 ```markdown

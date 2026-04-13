@@ -1,2 +1,5 @@
 # Claude Code runtime
 .claude/worktrees/
+
+# 个人工作区配置（含作者姓名等，不应提交到公共仓库）
+context/workspace-config.md

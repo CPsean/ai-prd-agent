@@ -305,3 +305,58 @@ B
 - [ ] 输出中包含"纯逻辑/配置类变更"或同义表述
 - [ ] **未**建议运行 `/generate-page-spec`（或仅作为可选提示）
 - [ ] 包含"如判断有误可手动运行"的兜底提示
+
+---
+
+## TC-NP-11 步骤0.5：首次使用时引导填写作者信息
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | ✅ 2026-04-13 |
+| **测试目标** | 验证 `context/workspace-config.md` 不存在或 author 为占位符时，AI 主动引导用户填写，并保存到配置文件 |
+| **前置条件** | `context/workspace-config.md` 不存在，或文件中 `author: your-name` 未修改 |
+
+**测试输入**
+```
+/new-prd story-card 用户登录失败提示优化
+```
+
+**预期行为**
+1. AI 在执行任何文件操作前，检测到 workspace-config.md 不存在或 author 为占位符
+2. 输出引导提示：「首次使用提示：请告诉我你的姓名或花名……」
+3. 用户回复姓名（如"张三"）
+4. AI 创建或更新 `context/workspace-config.md`，将 `author` 字段设为"张三"
+5. 继续执行 /new-prd 的后续步骤（ID 分配、文件创建等）
+6. 创建的 prd.md 中 `author: 张三`
+
+**检查要点**
+- [ ] AI 在步骤 0.5 输出了姓名引导提示，未直接跳到 ID 分配
+- [ ] `context/workspace-config.md` 文件已创建/更新，`author` 字段为用户输入值
+- [ ] 创建的 `prd.md` 中 `author` 字段为用户提供的姓名（非空、非占位符）
+- [ ] 引导只出现一次，后续步骤正常执行
+
+---
+
+## TC-NP-12 步骤0.5：已配置作者时静默读取，不重复询问
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | ✅ 2026-04-13 |
+| **测试目标** | 验证 `author` 已在 workspace-config.md 中填写时，AI 静默读取并填充，不向用户重复询问 |
+| **前置条件** | `context/workspace-config.md` 存在，且 `author: 张三`（非占位符） |
+
+**测试输入**
+```
+/new-prd story-card 搜索结果排序优化
+```
+
+**预期行为**
+1. AI 读取 `context/workspace-config.md`，获取 `author: 张三`
+2. **不**向用户输出任何姓名引导提示
+3. 正常执行后续步骤
+4. 创建的 prd.md 中 `author: 张三`
+
+**检查要点**
+- [ ] AI 输出中**不包含**姓名引导提示或 workspace-config 相关说明
+- [ ] 创建的 `prd.md` 中 `author` 字段为"张三"
+- [ ] 整体流程与无 author 配置时相比无额外交互步骤
