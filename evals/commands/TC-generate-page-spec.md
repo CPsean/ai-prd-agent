@@ -3,6 +3,7 @@
 > 关联命令：`.claude/commands/generate-page-spec.md`
 > 参数格式：`/generate-page-spec [标题或ID]`
 > 前置条件：目标 PRD 已在 `prds/` 正式区注册
+> Codex 等效输入：「为 [标题] 生成页面规格卡」或「帮我从 [标题] PRD 中提取页面规格」
 
 ---
 

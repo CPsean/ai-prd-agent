@@ -3,6 +3,7 @@
 > 关联命令：`.claude/commands/design-solution.md`
 > 参数格式：`/design-solution`（无参数，自动读取最新分析报告）
 > 前置条件：`analysis/` 目录下存在需求分析报告
+> Codex 等效输入：「基于需求分析报告，帮我做方案架构设计」或「读取 analysis/ 里的报告，输出方案设计文档」
 
 ---
 

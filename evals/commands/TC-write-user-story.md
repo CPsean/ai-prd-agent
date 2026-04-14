@@ -3,6 +3,7 @@
 > 关联命令：`.claude/commands/write-user-story.md`
 > 参考规范：`.claude/skills/user-story/SKILL.md`
 > 前置条件：无特殊前置文件
+> Codex 等效输入：「帮我写 [需求描述] 的用户故事」或「为 [功能] 生成 Gherkin 格式的开发用户故事」
 
 ---
 

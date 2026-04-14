@@ -3,6 +3,7 @@
 > 关联命令：`.claude/commands/design-data-model.md`
 > 参数格式：`/design-data-model [业务场景]`
 > 前置条件：无特殊前置文件
+> Codex 等效输入：「帮我设计 [业务场景] 的数据库模型」或「按 DDD 原则为 [场景] 生成数据库表结构」
 
 ---
 

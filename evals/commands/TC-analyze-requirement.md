@@ -3,6 +3,7 @@
 > 关联命令：`.claude/commands/analyze-requirement.md`
 > 参数格式：`/analyze-requirement [需求描述]`
 > 前置条件：无特殊前置文件
+> Codex 等效输入：「帮我深度分析这个需求：[需求描述]」或「对这个需求做完整的需求分析报告：[描述]」
 
 ---
 

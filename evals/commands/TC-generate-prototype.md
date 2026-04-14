@@ -3,6 +3,7 @@
 > 关联命令：`.claude/commands/generate-prototype.md`
 > 参数格式：`/generate-prototype [标题或ID]`
 > 前置条件：目标 PRD 已在 `prds/` 正式区注册
+> Codex 等效输入：「为 [标题] 生成可交互原型」或「帮我做 [标题] 的 HTML 原型」
 
 ---
 

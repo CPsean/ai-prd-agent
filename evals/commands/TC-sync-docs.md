@@ -3,6 +3,7 @@
 > 关联命令：`.claude/commands/sync-docs.md`
 > 参数格式：`/sync-docs [标题或ID]`
 > 前置条件：目标 PRD 已在 `prds/` 正式区注册，存在关联文档（page-spec / 原型）
+> Codex 等效输入：「检查 [标题] 的文档一致性」或「[标题] PRD 更新了，帮我核查关联文档是否需要同步」
 
 ---
 

@@ -2,6 +2,7 @@
 
 > 关联命令：`.claude/commands/ingest-prd.md`、`.claude/skills/ingest-prd.md`
 > 前置条件：`prds/_registry.md` 存在；`context/` 相关文件已初始化（如有）
+> Codex 等效输入：「帮我录入一份历史 PRD」或「我有一份旧的需求文档，帮我归档到工作区」
 
 ---
 
