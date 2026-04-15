@@ -110,7 +110,27 @@ $ARGUMENTS
 - 全部通过时输出：`✅ PRD 质检通过`
 - 若 PRD 在 `drafts/`：跳过此步骤（草稿尚未进入评审流程）
 
-**8. 草稿区发布询问（仅当 PRD 在 drafts/ 时）**
+**8. context 文件同步检查（仅正式区 PRD，且类型为 feature 或 epic 时执行）**
+
+读取本次变更内容，判断是否引入了新的功能节点或业务术语：
+
+- **新增功能节点**（如本次变更新增了页面、模块或功能入口）→ 提议更新 `context/product-feature-map.md`：
+
+  > 本次变更新增了以下功能节点，建议追加到 `context/product-feature-map.md`：
+  > [节点列表]
+  > 回复「确认」写入，或告知需要修改。
+
+  用户确认后更新 product-feature-map.md（含前缀映射表和 Mermaid 功能树）。
+
+- **新增业务术语**（如本次变更引入了 `context/business-glossary.md` 中尚未定义的专有名词）→ 提议追加：
+
+  > 本次变更引入了以下新术语，建议追加到 `context/business-glossary.md`：
+  > [术语表格]
+  > 回复「确认」写入，或告知需要修改。
+
+- 两者均无变化时，静默跳过，不提示。
+
+**9. 草稿区发布询问（仅当 PRD 在 drafts/ 时）**
 
 > 草稿已更新完成。是否现在移入正式区（prds/）？
 > - **A. 继续完善**：留在草稿区，稍后再发布
