@@ -47,6 +47,8 @@
 - `context/permission-model.md`：权限模型类型（RBAC/ABAC/PBAC）及角色定义，撰写 PRD 权限控制章节时读取
 - `context/platform-support.md`：产品支持的端清单及各端约束（由用户自行维护，模板中的端列表仅为示例），撰写 PRD 端差异说明章节时读取
 - `context/iteration-requirement-list.md`：历史迭代需求汇总表（可选），供 `/ingest-prd` 匹配需求 ID；文件不存在时跳过，不影响其他功能
+- `context/business-glossary.md`：产品业务术语字典，随需求迭代增长；PRD §4 只写本需求新引入术语，已有术语引用此文件；由 `/requirement-clarifier` 保存 RDD 后 AI 提议追加，用户确认写入
+- `context/product-feature-map.md`：产品功能结构树（Mermaid）+ 功能编号前缀映射表；PRD §5 只写本需求新增/调整节点，完整结构见此文件；仅在 PRD 移入正式区（prds/）后 AI 提议更新，用户确认写入
 
 ---
 
@@ -126,6 +128,22 @@
 | Layer 3 | 史诗 PRD（Epic PRD） | E- | 大型项目，含多个功能 | `templates/epic-prd.md` |
 
 **用户故事在每层都是必须项。**
+
+**Feature PRD 章节结构（§1-§11）**：
+
+| 章节 | 标题 | 说明 |
+|------|------|------|
+| §1 | 文档元数据 | 含关联 RDD/规格卡/原型字段 |
+| §2 | 文档修订记录 | |
+| §3 | 需求概要 | 3.1 问题与机会 / 3.2 目标用户 / 3.3 方案概述 / 3.4 成功指标 |
+| §4 | 需求对象与概念模型 | 只写本 PRD **新引入**术语，已有术语引用 `context/business-glossary.md` |
+| §5 | 功能结构 | 只写本 PRD **新增/调整**节点，完整结构见 `context/product-feature-map.md` |
+| §6 | 用户故事与用例 | Epic + Must Have，含 Gherkin AC（故事级） |
+| §7 | 功能清单 | 编号格式 `[AREA]-[CAT]-[SEQ]`，先查前缀映射表；名称全限定；动词具体 |
+| §8 | 功能需求说明书 | 逐功能展开；§8.x.1-§8.x.3 必填；§8.x.4-§8.x.9 按条件填（不适用填「不涉及」） |
+| §9 | 非功能性需求 | 性能 / 安全 / 可用性 / 兼容性 / 数据统计 |
+| §10 | 范围外（Out of Scope） | |
+| §11 | 开放问题 | approved 前须清空 |
 
 ### PRD 目录结构
 
@@ -239,6 +257,7 @@ has-prototype: false
   → AI 主动提问：方案细节澄清             （产品视角，≤3问/轮）
   → AI 判断收敛 → 建议移入正式区
   → 「确认 [标题] PRD 移入正式区」         （移入 prds/，注册）
+  → AI 提议更新 context 文件              （product-feature-map.md 新节点 + business-glossary.md 新术语，用户确认后写入）
   → AI 自动判断是否涉及页面变更
 
 涉及页面变更
@@ -308,3 +327,4 @@ has-prototype: false
 | 2026-04-10 | **新增命令 `/sync-docs`**：读取 PRD CHANGELOG 与关联文档元数据，比对版本差异，输出潜在不一致清单 + 建议操作；`/update-prd`、`/generate-prototype` 末尾同步加入轻量提示 |
 | 2026-04-10 | **新增模板 `templates/iteration-prd.md`**：迭代类 PRD 精简模板，含 `modifies` 关联字段、变更前→变更后结构、只写变化部分的页面/规则章节；`/new-prd` 步骤0新增迭代类型识别和模板路由 |
 | 2026-04-10 | **对话开场引导**：CLAUDE.md 顶部新增路径选择菜单（8条路径），模糊输入或触发词时展示，命令速查表和标准工作流同步更新 |
+| 2026-04-15 | **PRD 输出质量升级**：(1) `/requirement-clarifier` 新增 Step 0 按需读取 6 个 context 文件、Step 5 输出 RDD 双节结构（需求摘要 7 维 + 初步方案 6 小节）、Step 6.5 业务术语提议；(2) `templates/feature-prd.md` 重写为 §1-§11 完整结构，含 §7 功能清单（[AREA]-[CAT]-[SEQ] 编号）和 §8 逐功能展开（§8.1-§8.9 条件填写）；(3) 新建 `templates/rdd.md` 作为 RDD 格式基准；(4) 新建 `context/business-glossary.md`（业务术语字典）和 `context/product-feature-map.md`（功能结构树 + 前缀映射表），由需求/PRD 流程联动维护；(5) `/new-prd` 新增 5a 功能编号生成、5b §8 展开指引、Step 7 后 context 同步提示；(6) `/update-prd` 新增 Step 8 context 同步检查；(7) `/ingest-prd` 新增 Step 9 context 同步；(8) `rules/prd-quality-gates.md` 新增 G7（功能清单规范）和 G8（§8 必填完整性） |

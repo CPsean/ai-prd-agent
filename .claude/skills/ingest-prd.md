@@ -194,6 +194,39 @@ Q2 [类别] 问题描述
 
 ---
 
+### Step 9：context 文件同步（录入完成后执行）
+
+缺口问题全部确认、PRD 录入完成后，从导入的 PRD 内容中提炼并提议更新两个 context 文件：
+
+**9a. 产品功能结构更新**
+
+从 PRD 中提取功能节点和模块信息，提议追加到 `context/product-feature-map.md`：
+
+> **建议将以下内容追加到 `context/product-feature-map.md`：**
+> - 前缀映射表追加：[模块名] → [英文前缀]
+> - 功能节点追加：[新节点列表（Mermaid 格式）]
+>
+> 回复「确认」写入，或告知需要修改。
+
+若 `context/product-feature-map.md` 不存在，提议以本次导入内容为基础创建初始文件。
+用户确认后：更新（或创建）`context/product-feature-map.md`。
+
+**9b. 业务术语追加**
+
+从 PRD 中识别专有名词（业务对象、状态名、操作动词等），与 `context/business-glossary.md` 对照，找出未定义的新术语，提议追加：
+
+> **发现以下新术语，建议追加到 `context/business-glossary.md`：**
+> | 名词 | 建议定义 | 约束/备注 |
+> |---|---|---|
+> | [术语名] | [建议定义] | [约束说明] |
+>
+> 回复「确认」写入，或告知需要修改的定义。
+
+若 `context/business-glossary.md` 不存在，提议以提炼结果创建初始文件。
+无新术语时静默跳过。
+
+---
+
 ## 产品线推断规则
 
 > **产品线由用户在 `context/product-background.md` 中定义和维护，不在此文件中硬编码。**
