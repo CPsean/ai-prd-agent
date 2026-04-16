@@ -158,3 +158,82 @@
 - [ ] 报告中区分 page-spec 状态（一致）和原型状态（落后）
 - [ ] 建议操作为 `/generate-prototype [标题]`
 - [ ] **不**建议重新运行 `/generate-page-spec`（page-spec 已是最新）
+
+---
+
+## TC-SD-07 Context 一致性：PRD §4 有未在 glossary 登记的术语
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 sync-docs 的 Step 5a 能识别 §4 中未在 glossary 中登记的术语 |
+| **前置条件** | `prds/消息推送设置/prd.md` 已注册；§4 中包含"推送订阅组"术语；`context/business-glossary.md` 中**无**"推送订阅组"定义 |
+
+**测试输入**
+```
+/sync-docs 消息推送设置
+```
+
+**预期行为**
+1. 完成文档版本检查（Step 1-4）
+2. Step 5a：读取 §4，识别"推送订阅组"未在 glossary 中登记
+3. 在报告末尾追加"Context 一致性"小节
+4. 列出"推送订阅组"为术语孤岛
+
+**检查要点**
+- [ ] 报告中包含"Context 一致性"小节
+- [ ] "推送订阅组"出现在术语孤岛列表
+- [ ] 建议操作包含"追加到 `context/business-glossary.md`"
+- [ ] 已在 glossary 中定义的其他术语**不**出现在孤岛列表
+
+---
+
+## TC-SD-08 Context 一致性：PRD §7 有未在 feature-map 注册的编号前缀
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 sync-docs 的 Step 5b 能识别 §7 中使用了未在 feature-map 注册的前缀 |
+| **前置条件** | `prds/消息推送设置/prd.md` 已注册；§7 中有功能编号 `MSG-PUSH-001`；`context/product-feature-map.md` 前缀映射表中**无** `MSG` 前缀 |
+
+**测试输入**
+```
+/sync-docs 消息推送设置
+```
+
+**预期行为**
+1. Step 5b：读取 §7 功能清单，提取前缀 `MSG`
+2. 与 `product-feature-map.md` 前缀映射表比对，识别 `MSG` 未注册
+3. 在"Context 一致性"小节中列出未注册前缀
+
+**检查要点**
+- [ ] `MSG` 出现在功能前缀未注册列表
+- [ ] 建议操作包含"追加到 `context/product-feature-map.md` 前缀映射表"
+- [ ] 已注册的其他前缀**不**出现在未注册列表
+
+---
+
+## TC-SD-09 Context 文件不存在时跳过 Step 5，不影响正常输出
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 business-glossary.md 和 product-feature-map.md 均不存在时，Step 5 静默跳过，不影响版本检查输出 |
+| **前置条件** | `prds/消息推送设置/prd.md` 已注册；`context/business-glossary.md` 和 `context/product-feature-map.md` 均**不存在** |
+
+**测试输入**
+```
+/sync-docs 消息推送设置
+```
+
+**预期行为**
+- 正常完成文档版本检查（Step 1-4），输出版本一致性报告
+- Step 5 静默跳过
+- 输出中**不包含**"Context 一致性"小节
+- 无报错，无"文件未找到"类型的警告
+
+**检查要点**
+- [ ] 输出正常包含文档版本检查报告
+- [ ] 输出**不包含** "Context 一致性"字样
+- [ ] 无任何报错或警告信息
+- [ ] 若文档版本一致，正常输出"所有关联文档与当前 PRD 保持一致"

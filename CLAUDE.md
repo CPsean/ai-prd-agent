@@ -45,7 +45,7 @@
 - `context/product-strategy.md`：迭代原则、优先级矩阵、边界约束
 - `context/user-persona.md`：用户角色、核心目标、痛点和使用场景
 - `context/permission-model.md`：权限模型类型（RBAC/ABAC/PBAC）及角色定义，撰写 PRD 权限控制章节时读取
-- `context/platform-support.md`：产品支持的端清单及各端约束（由用户自行维护，模板中的端列表仅为示例），撰写 PRD 端差异说明章节时读取
+- `context/platform-support.md`：产品支持的端清单及各端约束（由用户自行维护，模板中的端列表仅为示例）；读取命令：`/requirement-clarifier` Phase 1 背景读取（识别端约束信号）、`/new-prd` 写 §9.4 兼容性时读取
 - `context/iteration-requirement-list.md`：历史迭代需求汇总表（可选），供 `/ingest-prd` 匹配需求 ID；文件不存在时跳过，不影响其他功能
 - `context/business-glossary.md`：产品业务术语字典，随需求迭代增长；PRD §4 只写本需求新引入术语，已有术语引用此文件；由 `/requirement-clarifier` 保存 RDD 后 AI 提议追加，用户确认写入
 - `context/product-feature-map.md`：产品功能结构树（Mermaid）+ 功能编号前缀映射表；PRD §5 只写本需求新增/调整节点，完整结构见此文件；仅在 PRD 移入正式区（prds/）后 AI 提议更新，用户确认写入
@@ -71,7 +71,7 @@
 
 | 命令 | 用途 | 阶段 |
 |------|------|------|
-| `/requirement-clarifier [需求描述]` | JTBD 框架识别真实问题，生成 RDD 卡片 | 需求发现 |
+| `/requirement-clarifier [需求描述 \| 标题]` | 两阶段：Phase 1 生成用户故事确认方向 → Phase 2 多轮对话生成 RDD（对话信号驱动按需加载 context）；传入已有标题可续接中断的分析 | 需求发现 |
 | `/analyze-requirement [需求描述]` | 深度需求分析，输出分析报告至 `analysis/` | Phase 1 |
 | `/design-solution` | 方案架构设计，读取分析报告输出方案文档 | Phase 2 |
 | `/write-user-story [需求描述]` | 生成 Gherkin 格式开发可交付用户故事 | PRD 撰写期 |
@@ -247,8 +247,10 @@ has-prototype: false
 
 ```
 新需求（模糊）
-  → /requirement-clarifier [需求描述]     （JTBD 发现真实问题，生成 RDD 卡片）
-  → 自动衔接：/new-prd [标题]            （读取 RDD，跳过需求讨论）
+  → /requirement-clarifier [需求描述]     （Phase 1：生成用户故事，用户确认方向）
+  → /requirement-clarifier [标题]         （Phase 2：多轮对话，对话信号驱动按需加载 context，生成完整 RDD）
+  → rdd.md status=rdd-complete            （自动衔接：/new-prd [标题] 读取 RDD，跳过需求讨论）
+  → 中断续接：新对话中运行 /requirement-clarifier [标题] 从断点恢复
 
 新需求（明确）/ 迭代优化
   → /new-prd [type] [标题]               （AI 询问新功能 or 迭代，选对应模板）
@@ -293,6 +295,11 @@ has-prototype: false
 
 **三者不一致 = 变更未完成。** AI 在修改命令定义后，应主动检查并同步另外两个文件。
 
+**特别说明**：以下情况也属于三件套变更范围：
+- 修改 context 文件的读取时机（如从"全量预读"改为"按章节按需读取"）
+- 新增或删除某命令对某 context 文件的读取
+- 修改 rdd.md 的 frontmatter 字段结构
+
 ---
 
 ## 最佳实践
@@ -328,3 +335,4 @@ has-prototype: false
 | 2026-04-10 | **新增模板 `templates/iteration-prd.md`**：迭代类 PRD 精简模板，含 `modifies` 关联字段、变更前→变更后结构、只写变化部分的页面/规则章节；`/new-prd` 步骤0新增迭代类型识别和模板路由 |
 | 2026-04-10 | **对话开场引导**：CLAUDE.md 顶部新增路径选择菜单（8条路径），模糊输入或触发词时展示，命令速查表和标准工作流同步更新 |
 | 2026-04-15 | **PRD 输出质量升级**：(1) `/requirement-clarifier` 新增 Step 0 按需读取 6 个 context 文件、Step 5 输出 RDD 双节结构（需求摘要 7 维 + 初步方案 6 小节）、Step 6.5 业务术语提议；(2) `templates/feature-prd.md` 重写为 §1-§11 完整结构，含 §7 功能清单（[AREA]-[CAT]-[SEQ] 编号）和 §8 逐功能展开（§8.1-§8.9 条件填写）；(3) 新建 `templates/rdd.md` 作为 RDD 格式基准；(4) 新建 `context/business-glossary.md`（业务术语字典）和 `context/product-feature-map.md`（功能结构树 + 前缀映射表），由需求/PRD 流程联动维护；(5) `/new-prd` 新增 5a 功能编号生成、5b §8 展开指引、Step 7 后 context 同步提示；(6) `/update-prd` 新增 Step 8 context 同步检查；(7) `/ingest-prd` 新增 Step 9 context 同步；(8) `rules/prd-quality-gates.md` 新增 G7（功能清单规范）和 G8（§8 必填完整性） |
+| 2026-04-16 | **数据飞轮完善 + 两阶段需求分析重构**：(1) `/requirement-clarifier` 重构为两阶段流程——Phase 1（仅读 user-persona + product-background + platform-support，生成用户故事，阻塞确认）→ Phase 2（对话信号驱动按需加载剩余 context，多轮澄清生成 RDD）；支持传入标题续接中断分析；(2) `templates/rdd.md` 新增 status/phase/context-loaded/story-version frontmatter 字段，rdd.md 改为渐进式写入（story-confirmed → rdd-in-progress → rdd-complete）；(3) `/new-prd` 新增 Step 5-0 rdd.md 状态检查（未完成时给出提示和选项），按 PRD 章节分步加载 context 文件；(4) 修复 `context/platform-support.md` 孤岛——接入 requirement-clarifier Phase 1 和 new-prd §9.4；(5) `/sync-docs` 新增 Step 5 context 一致性检查（术语孤岛 + 功能前缀未注册），飞轮由单向变双向；(6) `rules/prd-quality-gates.md` 新增 G9（平台兼容性，条件触发）；(7) 新增 `evals/integration/TC-workflow-chain.md`（8 个端到端集成测试），补充 TC-RC-09/10/11/12、TC-NP-16/17、TC-SD-07/08/09 |

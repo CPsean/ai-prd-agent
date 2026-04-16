@@ -470,3 +470,84 @@ B
 - [ ] AI 输出中**不包含**姓名引导提示或 workspace-config 相关说明
 - [ ] 创建的 `prd.md` 中 `author` 字段为"张三"
 - [ ] 整体流程与无 author 配置时相比无额外交互步骤
+
+---
+
+## TC-NP-16 platform-support.md 存在时 §9.4 有兼容性说明
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 `context/platform-support.md` 存在且有已支持端时，PRD §9.4 包含各端兼容性说明 |
+| **前置条件** | `context/platform-support.md` 存在，包含"iOS App：已支持"、"Android App：已支持"、"PC Web：已支持" |
+
+**测试输入**
+```
+/new-prd feature 消息推送设置
+
+需求背景：用户可自主控制接收消息类型和渠道，管理员可配置强制开启项。
+```
+
+**预期行为**
+1. AI 执行到 §9（非功能性需求）时，读取 `context/platform-support.md`
+2. §9.4 兼容性章节包含对 iOS App、Android App、PC Web 三端的兼容性说明
+3. 说明内容应体现该需求在各端的支持情况（支持/不支持/部分支持）
+
+**检查要点**
+- [ ] 生成的 `prd.md` 包含 §9.4 兼容性章节
+- [ ] §9.4 中提及了 `platform-support.md` 中已支持的端（至少提及 iOS App、Android App）
+- [ ] §9 **之前**的章节生成过程中，AI **未**读取 `platform-support.md`（按需加载）
+- [ ] 若某端不支持该需求，§10 范围外章节有对应说明（或 §9.4 明确标注"不支持"）
+
+---
+
+## TC-NP-17 按章节分步加载验证——写到 §3 时不读 glossary
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 new-prd 按章节分步加载规则：写 §4 前不读 glossary，写 §9 前不读 platform-support |
+| **前置条件** | `context/business-glossary.md` 和 `context/platform-support.md` 均存在 |
+
+**测试场景**：执行 new-prd，填充 PRD 内容时，观察各章节触发的文件读取。
+
+**预期行为**
+- 写 §3（需求概要）时：**不读取** `business-glossary.md`，**不读取** `product-feature-map.md`
+- 写 §4（需求对象与概念模型）时：**读取** `business-glossary.md`
+- 写 §7（功能清单）时：**读取** `product-feature-map.md`（若未读取）
+- 写 §9（非功能性需求）时：**读取** `platform-support.md`
+- 不涉及权限矩阵时：`permission-model.md` 未被读取
+
+**检查要点**
+- [ ] 最终 `prd.md` 中 §4 内容使用了 glossary 中的术语（间接验证已读取）
+- [ ] §7 功能编号前缀与 `product-feature-map.md` 中已有前缀一致（间接验证已读取）
+- [ ] §9.4 内容与 `platform-support.md` 中的端列表一致（间接验证已读取）
+- [ ] 若 §8 功能均不涉及多角色权限，AI 可完成全部章节而无需读取 `permission-model.md`
+
+---
+
+## TC-NP-18 requirement-clarifier 已创建目录但无 prd.md 时不误报冲突
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证冲突检测以 prd.md 文件存在性为准，而非目录存在性；避免 requirement-clarifier → new-prd 串联工作流被误判为冲突而阻断 |
+| **前置条件** | `drafts/批量导出功能/rdd.md` 已存在（由 `/requirement-clarifier` 创建），但 `drafts/批量导出功能/prd.md` **不存在** |
+
+**测试输入**
+```
+/new-prd feature 批量导出功能
+```
+
+**预期行为**
+1. Step 2 冲突检测：检查 `prds/批量导出功能/prd.md` → 不存在；检查 `drafts/批量导出功能/prd.md` → 不存在
+2. 判断**无冲突**，继续正常执行
+3. Step 3 创建文件：在已有 `drafts/批量导出功能/` 目录中创建 `prd.md`、`CHANGELOG.md`、`archive/`
+4. Step 5-0 读取 `rdd.md`，发现 `status: story-confirmed`，输出未完成提示并询问 A/B
+
+**检查要点**
+- [ ] **未输出**"发现同名 PRD"或任何冲突停止提示
+- [ ] `drafts/批量导出功能/prd.md` 正常创建
+- [ ] `drafts/批量导出功能/rdd.md` 原文件**保持不变**（未被覆盖）
+- [ ] Step 5-0 输出包含"需求分析尚未完成"提示
+- [ ] 提示中的状态显示为 `story-confirmed`

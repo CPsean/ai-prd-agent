@@ -231,6 +231,108 @@
 
 ---
 
+## TC-RC-09 platform-support.md 存在时 Phase 1 读取并在 Phase 2 识别端约束
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 `context/platform-support.md` 存在时，Phase 1 读取并在后续 Phase 2 对话中识别端约束信号 |
+| **前置条件** | `context/platform-support.md` 存在，包含"iOS App：已支持"、"微信小程序：已支持"、"PC Web：已支持" |
+
+**测试输入**
+```
+/requirement-clarifier 用户希望能在手机上快速查看自己的订单状态
+```
+
+**预期行为（Phase 1）**
+1. AI 读取 `context/platform-support.md`（Phase 1 背景读取）
+2. 生成用户故事时，角色/场景描述中可体现端意识（如"移动端用户"）
+3. 不询问"支持哪些端"（已从 platform-support.md 获知）
+
+**预期行为（Phase 2 对话中，用户提到"只想做小程序版"）**
+4. AI 识别到端约束信号
+5. 基于 platform-support.md 的已知信息，在 RDD 节 2 风险提示中体现小程序端约束
+
+**检查要点**
+- [ ] Phase 1 未询问"产品支持哪些端"
+- [ ] Phase 2 对话提到"小程序"后，RDD 风险提示包含端约束说明
+- [ ] rdd.md `context-loaded` 包含 `platform-support`
+
+---
+
+## TC-RC-10 多 context 文件存在时分步加载（非全量预读）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 Phase 2 中 context 文件按对话信号分步加载，Phase 1 只读背景文件 |
+| **前置条件** | `context/user-persona.md`、`context/product-background.md`、`context/permission-model.md`、`context/product-feature-map.md` 均存在 |
+
+**测试场景**：执行一次完整的两阶段流程，Phase 2 对话中**不提及**权限或功能模块相关内容。
+
+**预期行为**
+- Phase 1 读取：`user-persona.md`、`product-background.md`、`platform-support.md`（若存在）
+- Phase 2 未触发权限信号 → `permission-model.md` **未被读取**
+- Phase 2 未提及已有功能模块 → `product-feature-map.md` **未被读取**
+- rdd.md `context-loaded` 中只列出实际读取的文件
+
+**检查要点**
+- [ ] rdd.md `context-loaded` 不包含 `permission-model`（无权限信号时）
+- [ ] rdd.md `context-loaded` 不包含 `product-feature-map`（无功能模块信号时）
+- [ ] 整个流程正常完成，未因"未预加载"而报错
+
+---
+
+## TC-RC-11 中断续接——status=rdd-in-progress 从断点继续
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 Phase 2 进行一半后中断，新对话续接时展示已完成维度并从断点继续 |
+| **前置条件** | `drafts/报销单批量导出/rdd.md` 存在，`status: rdd-in-progress`，节 1 需求摘要已填写 3 个维度，节 2 方案边界已填写 |
+
+**测试输入**（新对话）
+```
+/requirement-clarifier 报销单批量导出
+```
+
+**预期行为**
+1. AI 读取 rdd.md，检测到 `status: rdd-in-progress`
+2. 输出已完成维度摘要（如"已明确：业务对象、用户角色、使用场景、方案边界"）
+3. 询问用户是否继续
+4. 用户确认后从未填写的维度继续提问，**不重复**已填写的内容
+
+**检查要点**
+- [ ] AI 输出中展示了已填写的维度列表
+- [ ] AI **未**重新询问已在 rdd.md 中填写的信息
+- [ ] 续接后的 Phase 2 问题聚焦在剩余未填维度上
+
+---
+
+## TC-RC-12 Phase 2 修正故事方向——原地覆盖 + story-version +1
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 Phase 2 发现故事方向错误时，正确执行原地覆盖并更新 story-version |
+| **前置条件** | rdd.md 存在，`status: story-confirmed`，`story-version: 1` |
+
+**测试场景**：Phase 2 澄清中，用户说"其实这个功能不是财务专员用的，是财务主管审批用的"（角色修正）
+
+**预期行为**
+1. AI 识别到用户故事角色需要修正
+2. 原地更新 rdd.md 中"用户故事（已确认）"小节内容
+3. `story-version` 从 1 更新为 2
+4. 在 rdd.md 顶部（YAML frontmatter 下方）追加修订注记：`> [修订 v2] {今天日期}：角色从财务专员修正为财务主管`
+
+**检查要点**
+- [ ] rdd.md 中用户故事内容已更新（角色为财务主管）
+- [ ] rdd.md `story-version: 2`
+- [ ] rdd.md 顶部有修订注记，包含 v2 和修订原因
+- [ ] 原始版本的用户故事**不**保留（原地覆盖，非追加）
+
+---
+
 ## TC-RC-05 /new-prd 读取 rdd.md 实现串联（流水线完整验证）
 
 | 字段 | 内容 |
