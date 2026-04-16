@@ -25,7 +25,17 @@
 
 **意图匹配规则**：
 - 输入编号 → 直接进入对应路径
-- 描述新功能需求 → 询问需求是否清晰，清晰走②，模糊走①
+- 描述新功能需求 → **默认走①**（`/requirement-clarifier`）  
+  以下情况才走②（直接 `/new-prd`）：  
+  · 用户明确说"不需要澄清"/"直接写 PRD"/"方案已定"  
+  · 且输入中不含任何 X-Y 风险信号  
+
+  **X-Y 风险信号——命中任一条强制走①，不询问**：  
+  · 用户直接给出解决方案而非问题（如"系统自动调整至页面边缘"）  
+  · 缺少边界条件定义（无阈值 / 范围 / 异常处理说明）  
+  · 涉及多角色但只描述了一个角色的视角  
+  · 可能是已有功能的边界场景而非全新独立功能  
+  · 命中 `rules/routing-signals.md` 中的产品专属信号
 - 说"改一下 XX 功能"/"优化 XX" → 走⑤
 - 说"画原型"/"做原型" → 判断是否有 PRD，有走⑦，无走①→②→⑦
 
@@ -90,10 +100,11 @@
 │   └─ → skill: jobs-to-be-done
 │       （理解客户的 Functional/Social/Emotional Jobs、Pains、Gains）
 │
-├─ 有一个功能想法/需求，但不确定问题是否说对
-│   └─ → /requirement-clarifier
+├─ 有一个功能想法/需求（无论描述是否清晰）
+│   └─ → /requirement-clarifier         （默认路径）
 │       （JTBD 快速诊断 X-Y 问题，输出 RDD 卡片）
 │       ⚠️ 输出的用户故事是草稿，不是开发规格
+│       ℹ️ 仅当用户明确说"方案已定，直接写PRD"且无 X-Y 风险信号时才走 /new-prd
 │
 ├─ 需求已澄清，要写开发可交付的用户故事
 │   └─ → /write-user-story
@@ -119,109 +130,19 @@
 
 ## PRD 结构规范
 
-### 三层文档体系
+> 详见 [`docs/prd-standards.md`](docs/prd-standards.md)。
+> 执行 `/new-prd`、`/update-prd`、`/prd-summary`、`/generate-page-spec` 时读取。
 
-| 层级 | 类型 | ID 前缀 | 适用场景 | 模板 |
-|------|------|---------|----------|------|
-| Layer 1 | 用户故事卡（Story Card） | SC- | 单场景小需求、子故事 | `templates/story-card.md` |
-| Layer 2 | 功能 PRD（Feature PRD） | F- | 一个完整功能模块 | `templates/feature-prd.md` |
-| Layer 3 | 史诗 PRD（Epic PRD） | E- | 大型项目，含多个功能 | `templates/epic-prd.md` |
-
-**用户故事在每层都是必须项。**
-
-**Feature PRD 章节结构（§1-§11）**：
-
-| 章节 | 标题 | 说明 |
-|------|------|------|
-| §1 | 文档元数据 | 含关联 RDD/规格卡/原型字段 |
-| §2 | 文档修订记录 | |
-| §3 | 需求概要 | 3.1 问题与机会 / 3.2 目标用户 / 3.3 方案概述 / 3.4 成功指标 |
-| §4 | 需求对象与概念模型 | 只写本 PRD **新引入**术语，已有术语引用 `context/business-glossary.md` |
-| §5 | 功能结构 | 只写本 PRD **新增/调整**节点，完整结构见 `context/product-feature-map.md` |
-| §6 | 用户故事与用例 | Epic + Must Have，含 Gherkin AC（故事级） |
-| §7 | 功能清单 | 编号格式 `[AREA]-[CAT]-[SEQ]`，先查前缀映射表；名称全限定；动词具体 |
-| §8 | 功能需求说明书 | 逐功能展开；§8.x.1-§8.x.3 必填；§8.x.4-§8.x.9 按条件填（不适用填「不涉及」） |
-| §9 | 非功能性需求 | 性能 / 安全 / 可用性 / 兼容性 / 数据统计 |
-| §10 | 范围外（Out of Scope） | |
-| §11 | 开放问题 | approved 前须清空 |
-
-### PRD 目录结构
-
-PRD 初稿先在 `drafts/`，用户确认后移入 `prds/`：
-
-```
-drafts/                       ← 第一步：/new-prd 在此创建草稿
-  [需求中文标题]/
-    prd.md                    ← 草稿内容（待确认，不可被 prd-qa/prd-summary 读取）
-    CHANGELOG.md
-    archive/
-
-        ↓ 用户说「确认 [标题] PRD 移入正式区」
-
-prds/                         ← 第二步：确认后移入，注册生效
-  _registry.md                ← AI 首先读这里，找到对应 PRD 路径
-  [需求中文标题]/
-    prd.md                    ← 当前有效版本（AI 主要消费此文件）
-    CHANGELOG.md              ← 变更记录（不作为主要参考）
-    fields.md                 ← 字段清单（Feature/Epic 级别）
-    prototype/
-      index.html              ← 可交互 HTML 原型（按需生成，需已在正式区）
-    archive/
-      prd-v1.0.md             ← 历史快照（禁止修改）
-  archive/                    ← 整体归档（需求废弃或完工）
-```
-
-### AI 读取规则
-
-1. **优先读 `prds/_registry.md`** → 定位目标 PRD 路径
-2. **只读 `prd.md`** → 当前版本，不读 `archive/` 下的历史文件
-3. **CHANGELOG.md** → 仅在被问及历史变更时读取
-
-### 版本管理规则
-
-- `prd.md` 永���是当前有效版本
-- 每次变更：自动归档旧版本 → 更新 `prd.md` → 追加 `CHANGELOG.md`
-- 小修改：版本号 +0.1（1.0 → 1.1）；重大重构：升主版本（1.x → 2.0）
-
-### YAML Frontmatter 标准
-
-每个 `prd.md` 必须包含以下头部：
-
-```yaml
----
-type: story-card | feature-prd | epic-prd
-id: SC-001 | F-001 | E-001
-title: 中文标题
-status: draft | in-review | approved | released
-version: "1.0"
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
-author:
-feature-area:
-has-prototype: false
----
-```
+关键速查：
+- 三层 ID 前缀：SC-（故事卡）/ F-（功能PRD）/ E-（史诗PRD）
+- PRD 权威位置：`prds/[标题]/prd.md`（草稿在 `drafts/`）
+- Feature PRD 章节：§1 元数据 → §6 用户故事 → §7 功能清单 → §8 功能说明 → §11 开放问题
 
 ---
 
 ## 文件夹说明
 
-| 文件夹 | 用途 |
-|--------|------|
-| `.claude/commands/` | 斜杠命令定义（Claude Code 原生支持） |
-| `.claude/skills/` | 技能规格文档（命令的详细定义参考） |
-| `analysis/` | 业务分析产物（需求分析报告等） |
-| `assets/` | 图片、原型图、流程图等资源文件 |
-| `context/` | 项目上下文（用户画像、产品策略、背景） |
-| `docs/` | 参考文档库 |
-| `drafts/` | 草稿暂存区：PRD 初稿（待用户确认）+ 方案设计文档 |
-| `outputs/` | 对外交付物（演示材料、交接文档等，PRD 不在此） |
-| `prds/` | 正式 PRD（唯一权威来源，用户确认后从 drafts/ 移入） |
-| `prompts/` | 有效提示词沉淀 |
-| `evals/` | 测试用例集（命令行为测试、质检规则验证） |
-| `examples/` | 示例库（高质量案例、反面案例、skill 输出样本） |
-| `rules/` | 约束性规则（质量门禁、业务规则库、术语规范） |
-| `templates/` | 文档模板库 |
+> 各目录用途详见 [`docs/prd-standards.md`](docs/prd-standards.md)。
 
 ### examples/ AI 读取规则
 
@@ -246,14 +167,18 @@ has-prototype: false
 ### 标准工作流
 
 ```
-新需求（模糊）
+新需求（标准路径）
   → /requirement-clarifier [需求描述]     （Phase 1：生成用户故事，用户确认方向）
   → /requirement-clarifier [标题]         （Phase 2：多轮对话，对话信号驱动按需加载 context，生成完整 RDD）
   → rdd.md status=rdd-complete            （自动衔接：/new-prd [标题] 读取 RDD，跳过需求讨论）
   → 中断续接：新对话中运行 /requirement-clarifier [标题] 从断点恢复
 
-新需求（明确）/ 迭代优化
-  → /new-prd [type] [标题]               （AI 询问新功能 or 迭代，选对应模板）
+新需求（用户主动跳过澄清）
+  → /new-prd [type] [标题]               （需用户明确说"方案已定"/"直接写 PRD"，且无 X-Y 风险信号）
+  → AI 在 Step 5-0 标注"跳过澄清"，rdd.md 缺失时仍给出提示
+
+迭代优化
+  → /new-prd iteration [标题]
 
 草稿阶段（两轮澄清）
   → AI 主动提问：方案细节澄清             （产品视角，≤3问/轮）
@@ -285,20 +210,7 @@ has-prototype: false
 
 ### 命令变更规范
 
-任何斜杠命令的新增或修改，必须同步更新以下三个文件（"三件套"）：
-
-| 文件 | 作用 | 不更新的后果 |
-|------|------|-------------|
-| `.claude/commands/xxx.md` | 命令行为定义 | AI 执行逻辑与预期不符 |
-| `CLAUDE.md` 速查表 + 目录结构 + 工作流 | AI 和用户的认知对齐 | 参数格式、流程描述与实际行为矛盾 |
-| `evals/commands/TC-xxx.md` | 行为验证基准 | 测试通过但验证的是错误行为 |
-
-**三者不一致 = 变更未完成。** AI 在修改命令定义后，应主动检查并同步另外两个文件。
-
-**特别说明**：以下情况也属于三件套变更范围：
-- 修改 context 文件的读取时机（如从"全量预读"改为"按章节按需读取"）
-- 新增或删除某命令对某 context 文件的读取
-- 修改 rdd.md 的 frontmatter 字段结构
+> 修改任何斜杠命令时，必须同步"三件套"。详见 [`docs/contributing.md`](docs/contributing.md)。
 
 ---
 
@@ -326,13 +238,4 @@ has-prototype: false
 
 ## 项目演进日志
 
-| 日期 | 事件 |
-|------|------|
-| （首次使用时填写） | 项目初始化 |
-| 2026-04-10 | **串联流水线**：`/requirement-clarifier` 完成后自动保存 RDD 至 `drafts/[标题]/rdd.md` 并引导进入 `/new-prd`；`/new-prd` 新增步骤0（新功能/迭代识别）、步骤5.5（PRD细节两轮澄清，AI自判收敛）、移入正式区后自动判断是否涉及页面变更并引导后续步骤 |
-| 2026-04-10 | **新增命令 `/generate-page-spec`**：PRD → 页面规格卡，作为原型生成的前置中间层，保存至 `prds/[标题]/page-spec.md`，写入 `source-prd-version` 和 `last-updated` 元数据 |
-| 2026-04-10 | **新增命令 `/sync-docs`**：读取 PRD CHANGELOG 与关联文档元数据，比对版本差异，输出潜在不一致清单 + 建议操作；`/update-prd`、`/generate-prototype` 末尾同步加入轻量提示 |
-| 2026-04-10 | **新增模板 `templates/iteration-prd.md`**：迭代类 PRD 精简模板，含 `modifies` 关联字段、变更前→变更后结构、只写变化部分的页面/规则章节；`/new-prd` 步骤0新增迭代类型识别和模板路由 |
-| 2026-04-10 | **对话开场引导**：CLAUDE.md 顶部新增路径选择菜单（8条路径），模糊输入或触发词时展示，命令速查表和标准工作流同步更新 |
-| 2026-04-15 | **PRD 输出质量升级**：(1) `/requirement-clarifier` 新增 Step 0 按需读取 6 个 context 文件、Step 5 输出 RDD 双节结构（需求摘要 7 维 + 初步方案 6 小节）、Step 6.5 业务术语提议；(2) `templates/feature-prd.md` 重写为 §1-§11 完整结构，含 §7 功能清单（[AREA]-[CAT]-[SEQ] 编号）和 §8 逐功能展开（§8.1-§8.9 条件填写）；(3) 新建 `templates/rdd.md` 作为 RDD 格式基准；(4) 新建 `context/business-glossary.md`（业务术语字典）和 `context/product-feature-map.md`（功能结构树 + 前缀映射表），由需求/PRD 流程联动维护；(5) `/new-prd` 新增 5a 功能编号生成、5b §8 展开指引、Step 7 后 context 同步提示；(6) `/update-prd` 新增 Step 8 context 同步检查；(7) `/ingest-prd` 新增 Step 9 context 同步；(8) `rules/prd-quality-gates.md` 新增 G7（功能清单规范）和 G8（§8 必填完整性） |
-| 2026-04-16 | **数据飞轮完善 + 两阶段需求分析重构**：(1) `/requirement-clarifier` 重构为两阶段流程——Phase 1（仅读 user-persona + product-background + platform-support，生成用户故事，阻塞确认）→ Phase 2（对话信号驱动按需加载剩余 context，多轮澄清生成 RDD）；支持传入标题续接中断分析；(2) `templates/rdd.md` 新增 status/phase/context-loaded/story-version frontmatter 字段，rdd.md 改为渐进式写入（story-confirmed → rdd-in-progress → rdd-complete）；(3) `/new-prd` 新增 Step 5-0 rdd.md 状态检查（未完成时给出提示和选项），按 PRD 章节分步加载 context 文件；(4) 修复 `context/platform-support.md` 孤岛——接入 requirement-clarifier Phase 1 和 new-prd §9.4；(5) `/sync-docs` 新增 Step 5 context 一致性检查（术语孤岛 + 功能前缀未注册），飞轮由单向变双向；(6) `rules/prd-quality-gates.md` 新增 G9（平台兼容性，条件触发）；(7) 新增 `evals/integration/TC-workflow-chain.md`（8 个端到端集成测试），补充 TC-RC-09/10/11/12、TC-NP-16/17、TC-SD-07/08/09 |
+> 详见 [`docs/HISTORY.md`](docs/HISTORY.md)。
