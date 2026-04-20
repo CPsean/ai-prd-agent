@@ -552,3 +552,32 @@ B
 - [ ] `drafts/批量导出功能/rdd.md` 原文件**保持不变**（未被覆盖）
 - [ ] Step 5-0 输出包含"需求分析尚未完成"提示
 - [ ] 提示中的状态显示为 `story-confirmed`
+
+---
+
+## TC-NP-X 领域检查清单触发（domain-checklists.md 存在且命中）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **Codex 状态** | — |
+| **测试目标** | 验证 Step 5-1：需求内容命中 domain-checklists.md 关键词时，在填充 PRD 内容前输出领域影响结论块 |
+| **前置条件** | `context/domain-checklists.md` 已注册 DL-01；`drafts/印章管理/rdd.md` 已存在（status: rdd-complete） |
+
+**测试输入**
+```
+/new-prd feature 印章管理
+```
+
+**预期行为**
+1. Step 5-0 读取 rdd.md，status 为 rdd-complete，正常继续
+2. Step 5-1 检测 `context/domain-checklists.md` 存在，读取注册表
+3. rdd.md 内容含"印章" → 命中 DL-01 → 读取 signing-special-scenarios.md
+4. 在填充 PRD 各章节**之前**输出"特殊场景影响扫描"结论表
+5. 用户确认后继续填充 PRD 内容
+
+**检查要点**
+- [ ] 结论表在 PRD 内容填充前输出
+- [ ] 结论表包含 5 个场景行（SC-SS-01 至 SC-SS-05）
+- [ ] 用户确认后 PRD 正常填充
+- [ ] domain-checklists.md 不存在时输出提示并跳过，PRD 正常生成

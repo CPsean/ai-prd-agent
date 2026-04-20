@@ -140,6 +140,7 @@ c. 输出提示，进入 Phase 2：
 | 提及产品已有功能模块名称 | `context/product-feature-map.md` | 判断功能归属（新增/调整/复用），生成模块标注 |
 | 出现产品专有名词（非通用词） | `context/business-glossary.md` | 比对已有定义，识别新术语 |
 | "优先级"/"策略"/"边界约束"/"这期不做" | `context/product-strategy.md` | 评估需求优先级合理性，补充方案边界 |
+| 出现 `context/domain-checklists.md` 中注册的触发关键词（按需匹配） | `context/domain-checklists.md` | 读取注册表（最多 10 行），命中时读取对应清单文件（扫描时机含 `clarifier`，最多触发 3 个），在当轮输出澄清问题前输出领域影响结论块；文件不存在时输出提示后静默跳过 |
 
 文件读取后在 `rdd.md` frontmatter 的 `context-loaded` 列表中追加该文件名。
 
