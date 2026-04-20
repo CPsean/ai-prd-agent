@@ -61,7 +61,40 @@ $ARGUMENTS
 **若无不一致**，输出：
 > 所有关联文档与当前 PRD 保持一致，无需同步。
 
-**5. 询问是否立即执行**
+**5. Context 一致性检查**（可选，context 文件存在时执行）
+
+在文档版本检查完成后，额外检查 PRD 与产品上下文文件的一致性。
+
+**5a. 术语孤岛检查**（`context/business-glossary.md` 存在时）
+
+1. 读取 PRD §4（需求对象与概念模型）中列出的新引入术语
+2. 与 `context/business-glossary.md` 比对，找出 §4 中有但 glossary 中没有的术语
+3. 找出 glossary 中已有但 §4 未引用（本 PRD 明显用到但未提及）的术语
+
+**5b. 功能前缀检查**（`context/product-feature-map.md` 存在时）
+
+1. 读取 PRD §7（功能清单）中的所有功能编号前缀（`[AREA]` 部分）
+2. 与 `context/product-feature-map.md` 前缀映射表比对，找出未注册的前缀
+
+**5c. 输出格式**
+
+在文档版本检查报告之后，追加「Context 一致性」小节：
+
+```
+**Context 一致性检查：**
+
+术语孤岛（§4 有但 glossary 未登记）：
+- [术语名]（建议追加到 context/business-glossary.md）
+
+功能前缀未注册（§7 有但 feature-map 未登记）：
+- [前缀]（如 USR-，建议追加到 context/product-feature-map.md 前缀映射表）
+```
+
+若两项均无问题，输出：`✅ Context 一致性：无孤岛`
+
+若 context 文件均不存在，跳过本步骤，不输出任何提示。
+
+**6. 询问是否立即执行**
 
 > 是否现在开始同步？请告知需要处理哪几条，或回复"全部"由 AI 依次执行。
 

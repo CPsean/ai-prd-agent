@@ -41,7 +41,7 @@
 |-------------|------------|
 | 新建PRD / 写需求 / 起草功能 | `.claude/commands/new-prd.md` |
 | 更新PRD / 修改需求 / 变更描述 | `.claude/commands/update-prd.md` |
-| 需求澄清 / 分析问题 / 不清楚需求 | `.claude/commands/requirement-clarifier.md` |
+| 需求澄清 / 分析问题 / 不清楚需求 / 续接需求分析 / 继续澄清 / 恢复 RDD | `.claude/commands/requirement-clarifier.md` |
 | 生成页面规格 / 页面规格卡 | `.claude/commands/generate-page-spec.md` |
 | 生成原型 / 做原型 / 交互原型 | `.claude/commands/generate-prototype.md` |
 | 检查文档一致性 / 同步文档 | `.claude/commands/sync-docs.md` |
@@ -54,6 +54,31 @@
 | 用户故事 / Gherkin / 开发故事 | `.claude/commands/write-user-story.md` |
 
 意图不明确时，先询问用户确认，再读取命令文件执行。
+
+### 需求澄清器：两阶段流程与续接机制
+
+`requirement-clarifier` 采用两阶段流程，执行前先检测续接状态：
+
+1. **续接检测**：若用户传入的是已有需求标题（而非新需求描述），检查 `drafts/[标题]/rdd.md` 是否存在：
+   - 文件不存在 → 按新需求执行 Phase 1
+   - `status: story-confirmed` → 展示已确认的用户故事，直接进入 Phase 2
+   - `status: rdd-in-progress` → 展示已完成维度，询问从哪里继续
+   - `status: rdd-complete` → 提示分析已完成，下一步运行新建 PRD
+
+2. **Phase 1（轻量）**：基于 3 个背景文件快速生成用户故事草稿，等用户确认方向后阻塞
+3. **Phase 2（深度）**：多轮对话，对话信号驱动按需加载更多 context，生成完整 RDD 卡片
+
+**Codex 等效触发示例**：
+- 新需求："分析一下这个需求：用户希望批量导出报销单" → Phase 1
+- 续接："继续刚才的报销单批量导出需求分析" → 检测 rdd.md 状态后续接
+
+### sync-docs：包含 Context 一致性检查
+
+`sync-docs` 除检查 PRD / 页面规格 / 原型版本一致性外，还会额外检查：
+- **术语孤岛**：PRD §4 中有但 `context/business-glossary.md` 未登记的术语
+- **功能前缀**：PRD §7 中有但 `context/product-feature-map.md` 未注册的功能前缀
+
+若 context 文件不存在，自动跳过该检查项，不报错。
 
 ---
 

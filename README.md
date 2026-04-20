@@ -8,10 +8,10 @@
 
 一个开箱即用的 **AI 辅助 PRD 工作空间**，面向产品经理日常工作：
 
-- **需求澄清**：用 JTBD 框架识别真实问题，避免 X-Y 陷阱
-- **PRD 撰写**：三层文档体系（故事卡 / Feature PRD / Epic PRD），标准化模板 + 版本管理
+- **需求澄清**：两阶段 JTBD 框架识别真实问题，避免 X-Y 陷阱，输出结构化需求定义（RDD）
+- **PRD 撰写**：四层文档体系（故事卡 / Feature PRD / 迭代 PRD / Epic PRD），标准化模板 + 版本管理
 - **方案设计**：数据建模、交互原型、用户故事，AI 基于你的产品上下文生成
-- **评审对齐**：一键摘要、基于 PRD 的 Q&A，让产品/研发/测试对齐更高效
+- **评审对齐**：一键摘要、基于 PRD 的 Q&A、关联文档一致性核查，让产品/研发/测试对齐更高效
 
 **核心理念**：先让 AI 理解你的产品，再让它帮你写需求。产品上下文越完整，AI 输出质量越高。
 
@@ -228,6 +228,10 @@ npm install -g @anthropic-ai/claude-code
 请读取 context/product-background.md、context/product-strategy.md、context/user-persona.md，检查是否有遗漏或矛盾的地方，给我一个完整度评估。
 ```
 
+> **自动增长的上下文文件**：在日常使用中，AI 会随需求迭代提议更新以下两个文件——你确认后自动写入，无需手动维护：
+> - `context/business-glossary.md`：业务术语字典，每次需求澄清后由 AI 提议追加新术语
+> - `context/product-feature-map.md`：功能结构树 + 编号前缀映射表，每次 PRD 移入正式区后由 AI 提议更新
+
 ---
 
 #### 1.5 历史需求列表（可选，使用 `/ingest-prd` 时建议提前准备）
@@ -242,8 +246,6 @@ npm install -g @anthropic-ai/claude-code
 请帮我创建 context/iteration-requirement-list.md，格式参考模板，我会逐条补充历史需求信息。
 ```
 
-文件格式参考 `context/iteration-requirement-list.md`（预置空模板）。
-
 ---
 
 ### Step 2：从一个需求开始
@@ -251,37 +253,41 @@ npm install -g @anthropic-ai/claude-code
 产品上下文建立后，就可以开始正式的 PRD 工作流了：
 
 ```
-1. 启动 Claude Code，输入：
+1. 启动 Claude Code，输入需求（AI 默认走两阶段需求澄清）：
 
    /requirement-clarifier 我想做一个用户登录功能
 
-   AI 会通过追问帮你澄清真实问题，输出 RDD 需求卡片。
+   Phase 1：AI 生成用户故事，确认需求方向
+   Phase 2：多轮对话澄清细节，输出完整 RDD 需求卡片（自动保存到 drafts/）
 
-2. 确认需求后，创建 PRD 草稿：
+2. RDD 确认后，创建 PRD 草稿（AI 自动读取 RDD，跳过需求方向讨论）：
 
    /new-prd feature 用户登录
 
-   （草稿创建在 drafts/，尚未进入正式区）
+   草稿创建在 drafts/用户登录/prd.md
 
-3. 告诉 AI 需求细节，让它填写草稿内容：
-
-   请根据刚才的需求讨论，填写用户登录的 prd.md 内容
-
-   也可以直接打开 drafts/用户登录/prd.md 手动编辑。
-
-4. 内容完成后，确认移入正式区：
+3. AI 完成两轮细节澄清后，确认移入正式区：
 
    确认 用户登录 PRD 移入正式区
 
-   （AI 将草稿移入 prds/，注册到 _registry.md）
+   AI 将草稿移入 prds/，注册到 _registry.md
 
-5. 对齐评审前，输出摘要：
+4. 如果需求涉及界面，生成页面规格卡和可交互原型：
+
+   /generate-page-spec 用户登录
+   /generate-prototype 用户登录
+
+5. 评审前输出摘要：
 
    /prd-summary 用户登录
 
 6. 需求变更时更新（参数格式：标题 + 空格 + 变更描述）：
 
    /update-prd 用户登录 增加了手机号登录方式
+
+7. PRD 更新后核查关联文档一致性：
+
+   /sync-docs 用户登录
 ```
 
 ---
@@ -290,29 +296,35 @@ npm install -g @anthropic-ai/claude-code
 
 ```
 AI PRD/
-├── .claude/                   # Claude Code 配置中心
-│   ├── commands/              # 斜杠命令（/new-prd、/prd-qa 等）
-│   └── skills/                # AI 技能包（jobs-to-be-done、user-story 等）
-├── context/                   # 产品上下文（首次使用时建立）
-│   ├── product-background.md  # 产品背景（定位、产品线、架构、术语）← Step 1.1 创建
-│   ├── product-strategy.md    # 产品策略（原则、优先级、边界）← Step 1.2 创建
-│   ├── user-persona.md        # 用户画像（角色、目标、痛点、场景）← Step 1.3 创建
-│   ├── permission-model.md    # 权限模型定义（预置模板，按需初始化）
-│   └── platform-support.md   # 支持端清单（预置模板，按需初始化）
-├── prds/                      # 正式 PRD（唯一权威来源）
-│   └── _registry.md           # PRD 索引（AI 首先读这里）
-├── templates/                 # 文档模板库
-├── rules/                     # 约束性规则（质量门禁、业务规则、术语规范）
-├── evals/                     # 测试用例集（命令行为验证）
-├── examples/                  # 示例库（高质量案例、反面案例）
-├── analysis/                  # 业务分析产物
-├── drafts/                    # AI 协作草稿区（过程产物）
-├── outputs/                   # 最终对外交付物
-├── docs/                      # 参考文档库
-├── prompts/                   # 有效提示词沉淀
-├── assets/                    # 图片、原型图、流程图等资源
-├── CLAUDE.md                  # AI 全局知识库（自动加载）
-└── README.md                  # 本文件
+├── .claude/                        # Claude Code 配置中心
+│   ├── commands/                   # 斜杠命令（/new-prd、/prd-qa 等）
+│   └── skills/                     # AI 技能包（jobs-to-be-done、user-story 等）
+├── context/                        # 产品上下文（首次使用时建立）
+│   ├── product-background.md       # 产品背景（定位、产品线、架构、术语）← Step 1.1
+│   ├── product-strategy.md         # 产品策略（原则、优先级、边界）← Step 1.2
+│   ├── user-persona.md             # 用户画像（角色、目标、痛点、场景）← Step 1.3
+│   ├── permission-model.md         # 权限模型定义（预置模板，按需初始化）
+│   ├── platform-support.md         # 支持端清单（预置模板，按需初始化）
+│   ├── business-glossary.md        # 业务术语字典（AI 随需求迭代自动追加）
+│   └── product-feature-map.md      # 功能结构树 + 编号前缀映射（AI 随 PRD 确认自动更新）
+├── prds/                           # 正式 PRD（唯一权威来源）
+│   └── _registry.md                # PRD 索引（AI 首先读这里）
+├── drafts/                         # 草稿暂存区（PRD 初稿 + RDD 卡片）
+├── templates/                      # 文档模板库
+├── rules/                          # 约束性规则（质量门禁、业务规则、术语规范）
+│   └── routing-signals.md          # 产品专属路由信号（X-Y 风险识别）
+├── evals/                          # 测试用例集（命令行为验证）
+├── examples/                       # 示例库（高质量案例、反面案例）
+├── analysis/                       # 业务分析产物
+├── docs/                           # 参考文档库
+│   ├── prd-standards.md            # PRD 规范手册（三层体系、章节定义、目录结构）
+│   ├── contributing.md             # 命令变更规范（三件套，维护者用）
+│   └── HISTORY.md                  # 项目演进日志
+├── outputs/                        # 最终对外交付物
+├── prompts/                        # 有效提示词沉淀
+├── assets/                         # 图片、原型图、流程图等资源
+├── CLAUDE.md                       # AI 全局知识库（自动加载）
+└── README.md                       # 本文件
 ```
 
 ---
@@ -323,32 +335,36 @@ AI PRD/
 
 | 命令 | 用途 |
 |------|------|
-| `/new-prd [story-card\|feature\|epic] [标题]` | 新建 PRD，自动创建文件夹和注册 |
+| `/new-prd [story-card\|feature\|iteration\|epic] [标题]` | 新建 PRD，自动读取 RDD 草稿（如有），含两轮细节澄清 |
 | `/update-prd [标题] [变更描述]` | 更新 PRD，自动归档旧版本并写 changelog |
 | `/prd-summary [标题或ID]` | 输出 PRD 对齐摘要，适合评审前使用 |
 | `/prd-qa [问题]` | 基于 PRD 回答问题（产品/研发/测试均可用） |
-| `/generate-prototype [标题]` | 从 PRD 生成可交互 HTML 原型 |
+| `/generate-page-spec [标题]` | 从 PRD 提取页面规格卡（原型生成的前置步骤） |
+| `/generate-prototype [标题]` | 从页面规格卡（优先）或 PRD 生成可交互 HTML 原型 |
+| `/sync-docs [标题]` | 核查 PRD、页面规格卡、原型的一致性，列出差异和建议操作 |
+| `/ingest-prd` | 录入历史 PRD，自动重建结构、更新注册表和需求清单 |
 
 ### 需求分析
 
 | 命令 | 用途 |
 |------|------|
-| `/requirement-clarifier [需求描述]` | 识别真实问题，生成需求诊断卡片 |
+| `/requirement-clarifier [需求描述\|标题]` | 两阶段：Phase 1 生成用户故事确认方向 → Phase 2 多轮澄清生成 RDD；传入标题可续接中断的分析 |
 | `/analyze-requirement [需求描述]` | 深度需求分析，输出分析报告 |
 | `/design-solution` | 基于分析报告输出方案设计文档 |
-| `/write-user-story [需求描述]` | 生成 Gherkin 格式用户故事 |
+| `/write-user-story [需求描述]` | 生成 Gherkin 格式用户故事（正式交付开发用） |
 | `/design-data-model [业务场景]` | 生成企业级数据库 Schema |
 
 ---
 
-## PRD 三层体系
+## PRD 四层体系
 
 根据需求规模选择对应类型：
 
 | 类型 | 命令参数 | 适用场景 | 模板 |
 |------|---------|----------|------|
-| 用户故事卡 | `story-card` | 单场景小需求 | `templates/story-card.md` |
+| 用户故事卡 | `story-card` | 单场景小需求、子故事 | `templates/story-card.md` |
 | 功能 PRD | `feature` | 一个完整功能模块 | `templates/feature-prd.md` |
+| 迭代 PRD | `iteration` | 对已有功能的优化或局部调整 | `templates/iteration-prd.md` |
 | 史诗 PRD | `epic` | 大型项目，含多个功能 | `templates/epic-prd.md` |
 
 ---
@@ -356,36 +372,24 @@ AI PRD/
 ## 标准工作流
 
 ```
-新需求
-  → /requirement-clarifier [需求描述]      # 澄清真实问题
-  → /new-prd [type] [标题]                 # 草稿创建在 drafts/
-  → 告诉 AI 需求细节，让它填写 prd.md      # 或手动编辑
-  → 确认：「[标题] PRD 移入正式区」         # 移入 prds/ 并注册
-  → /prd-summary [标题或ID]                # 对齐评审
+新需求（标准路径）
+  → /requirement-clarifier [需求描述]      # Phase 1：用户故事确认方向
+  → /requirement-clarifier [标题]          # Phase 2：多轮澄清，生成 RDD
+  → /new-prd [type] [标题]                 # 读取 RDD，跳过需求方向讨论
+  → 「确认 [标题] PRD 移入正式区」          # 移入 prds/ 并注册
+
+新需求（跳过澄清，方案已定）
+  → /new-prd [type] [标题]                 # 直接创建，需明确说"方案已定"
+
+涉及界面变更
+  → /generate-page-spec [标题]             # PRD → 页面规格卡
+  → /generate-prototype [标题]             # 页面规格卡 → 可交互原型
+
+评审 & 迭代
+  → /prd-summary [标题]                    # 评审前对齐
   → /update-prd [标题] [变更描述]          # 评审后更新（自动存档）
-  → /generate-prototype [标题]             # 按需生成原型
+  → /sync-docs [标题]                      # 核查关联文档一致性
 ```
-
----
-
-## 文件夹说明
-
-| 文件夹 | 用途 |
-|--------|------|
-| `.claude/commands/` | 斜杠命令定义，Claude Code 自动识别 |
-| `.claude/skills/` | 技能规格文档，供命令引用 |
-| `context/` | 产品上下文（首次使用时通过 Step 1 建立） |
-| `prds/` | 正式 PRD，每个需求一个子文件夹，`prd.md` 是唯一有效版本 |
-| `templates/` | 文档模板，新建 PRD 时自动使用 |
-| `rules/` | 约束性规则（质量门禁、业务规则库、术语规范） |
-| `evals/` | 测试用例集（命令行为测试、质检规则验证） |
-| `examples/` | 示例库（高质量案例、反面案例、skill 输出样本） |
-| `drafts/` | 草稿暂存区：PRD 初稿（待用户确认）+ 方案设计文档 |
-| `outputs/` | 对外交付物（演示材料、交接文档等，PRD 不在此） |
-| `analysis/` | 业务分析产物（需求分析报告、流程推演等） |
-| `docs/` | 参考文档库 |
-| `prompts/` | 有效提示词沉淀，存放验证过的高质量提示词 |
-| `assets/` | 图片、原型图、流程图等资源文件 |
 
 ---
 
@@ -397,3 +401,6 @@ AI PRD/
 | 2026-03-28 | v2.0 | 迁移至 Claude Code，重构为斜杠命令体系 |
 | 2026-03-29 | v3.0 | README 面向开源场景重写，新增产品上下文交互式引导 |
 | 2026-04-09 | v4.0 | 引入 drafts/→prds/ 两阶段流转；完善 context/ 初始化引导（Step 1.4/1.5）；修正所有命令参数格式；新增 rules/、evals/、examples/、docs/、prompts/ 目录 |
+| 2026-04-10 | v4.1 | 新增 `/generate-page-spec`、`/sync-docs` 命令；新增迭代 PRD 模板（`iteration`）；`/new-prd` 支持迭代类型识别；串联流水线打通（RDD → PRD 自动衔接） |
+| 2026-04-15 | v4.2 | PRD 输出质量升级：Feature PRD 重写为 §1-§11 完整结构，含功能清单（§7）和逐功能展开（§8）；新增 `context/business-glossary.md` 和 `context/product-feature-map.md` 联动维护机制 |
+| 2026-04-16 | v5.0 | `/requirement-clarifier` 重构为两阶段流程（Phase 1 用户故事 → Phase 2 RDD），支持中断续接；路由规则升级为客观信号检查，默认走需求澄清路径；CLAUDE.md 瘦身（非运行时内容迁移至 `docs/`） |
