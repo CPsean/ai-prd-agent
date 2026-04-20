@@ -159,6 +159,7 @@
 | `rules/prd-quality-gates.md` | 执行 `/prd-summary`、`/update-prd` 时，在输出末尾自动进行质检 |
 | `rules/business-rules.md` | 撰写或审查 PRD 业务规则章节时，优先检查是否有可复用的全局规则 |
 | `rules/terminology.md` | 生成任何 PRD 内容时，术语以此文件为准；用户输入与此不一致时，输出时统一转换 |
+| `rules/data-flywheel.md` | 执行任何 PRD 命令时，判断飞轮触发条件、新术语/新功能节点的认定标准和输出格式 |
 
 ---
 
@@ -214,6 +215,29 @@
 
 ---
 
+## 数据飞轮准则
+
+> 详细判断逻辑见 [`rules/data-flywheel.md`](rules/data-flywheel.md)。
+
+**写出方向（PRD → Context）——以下事件触发时，AI 必须主动提议，不可跳过**：
+
+| 触发事件 | 必须执行的动作 |
+|---------|--------------|
+| `/requirement-clarifier` RDD 保存 | 提议追加新术语到 `context/business-glossary.md` |
+| `/new-prd` PRD 移入正式区 | 提议更新 `context/product-feature-map.md` 新功能节点 |
+| `/update-prd` 变更含新术语/新功能 | 提议同步对应 context 文件 |
+
+**读入方向（Context → PRD）——写到对应章节时，按需读取（文件存在时）**：
+
+| 写到哪个章节 | 必须读取 |
+|------------|---------|
+| §4 需求对象与概念模型 | `context/business-glossary.md`（避免重复定义已有术语） |
+| §5 功能结构 / §7 功能清单 | `context/product-feature-map.md`（获取已有编号前缀） |
+
+**强制规则**：AI 不得自动写入 context 文件——必须输出提议，等待用户确认后才写入。
+
+---
+
 ## 最佳实践
 
 1. 模糊需求先过 `/requirement-clarifier`，再建 PRD
@@ -239,4 +263,3 @@
 ## 项目演进日志
 
 > 详见 [`docs/HISTORY.md`](docs/HISTORY.md)。
-| 2026-04-15 | **PRD 输出质量升级**：(1) `/requirement-clarifier` 新增 Step 0 按需读取 6 个 context 文件、Step 5 输出 RDD 双节结构（需求摘要 7 维 + 初步方案 6 小节）、Step 6.5 业务术语提议；(2) `templates/feature-prd.md` 重写为 §1-§11 完整结构，含 §7 功能清单（[AREA]-[CAT]-[SEQ] 编号）和 §8 逐功能展开（§8.1-§8.9 条件填写）；(3) 新建 `templates/rdd.md` 作为 RDD 格式基准；(4) 新建 `context/business-glossary.md`（业务术语字典）和 `context/product-feature-map.md`（功能结构树 + 前缀映射表），由需求/PRD 流程联动维护；(5) `/new-prd` 新增 5a 功能编号生成、5b §8 展开指引、Step 7 后 context 同步提示；(6) `/update-prd` 新增 Step 7.7 自动质检 + Step 8 context 同步检查；(7) `/ingest-prd` 新增 Step 9 context 同步；(8) `rules/prd-quality-gates.md` 新增 G7（功能清单规范）和 G8（§8 必填完整性） |

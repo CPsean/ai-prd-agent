@@ -3,8 +3,26 @@
 > **使用场景**：由 `/requirement-clarifier` 自动生成，保存于 `drafts/[标题]/rdd.md`。
 > **用途**：作为 `/new-prd` 的输入源，AI 读取后自动填充 PRD §3 需求概要和 §7 功能清单初稿。
 > **不适合直接手动复制**：内容由 AI 在澄清对话结束后根据讨论结果填写。
+> **渐进式写入**：Phase 1 完成后创建（status: story-confirmed），Phase 2 逐步填充，完成后更新为 rdd-complete。
 
 ---
+
+```yaml
+---
+status: story-confirmed | rdd-in-progress | rdd-complete
+phase: 1 | 2
+context-loaded:           # Phase 2 中已按需加载的 context 文件列表
+  - user-persona
+  - product-background
+  - platform-support      # 若 Phase 1 读取
+  # Phase 2 按信号追加：permission-model / product-feature-map / business-glossary / product-strategy
+story-version: 1          # 用户故事修订次数（Phase 2 中修正方向时 +1）
+created: YYYY-MM-DD
+---
+```
+
+> 修订注记（若 story-version > 1，在此追加）：
+> `> [修订 v2] YYYY-MM-DD：[修订原因一句话]`
 
 # RDD：[需求标题]
 
