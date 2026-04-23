@@ -159,7 +159,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | ✅ 2026-04-10 |
-| **测试目标** | 验证 feature 类型时步骤 0 会询问新功能/迭代，选 B 后使用 iteration-prd 模板，并询问被迭代原始功能 |
+| **测试目标** | 验证 feature 类型时步骤 0 会询问新功能/迭代，选 B 后使用 feature-prd 模板并在 YAML 中注明被迭代原始功能 |
 | **前置条件** | 无特殊前置条件 |
 
 **测试输入**
@@ -178,15 +178,15 @@ B
 **预期行为**
 1. 创建文件后，步骤 0 主动询问：新功能 or 迭代优化？
 2. 用户选 B → 追加询问：被迭代的原始功能名称/ID
-3. 用户提供后 → 使用 `templates/iteration-prd.md` 生成 prd.md
+3. 用户提供后 → 使用 `templates/feature-prd.md` 生成 prd.md
 4. prd.md 的 YAML 中包含 `modifies: F-001` 和 `modifies-title: 消息推送设置`
-5. type 字段值为 `iteration`（而非 feature）
+5. §1 元数据或 §2 背景章节注明"本 PRD 为迭代优化"
 
 **检查要点**
 - [ ] AI 在步骤 0 输出了 A/B 选项（新功能 / 迭代优化）
 - [ ] 选 B 后进一步询问被迭代功能
-- [ ] `drafts/消息推送频率控制/prd.md` 使用了迭代模板结构（含"变更前→变更后"或"只写变化部分"格式）
-- [ ] `prd.md` frontmatter 中包含 `modifies: F-001`
+- [ ] `drafts/消息推送频率控制/prd.md` 使用 feature-prd 模板，frontmatter 包含 `modifies: F-001`
+- [ ] §1 或 §2 中有迭代说明文字
 - [ ] `prd.md` frontmatter 中包含 `modifies-title: 消息推送设置`
 - [ ] `type` 字段为 `iteration`
 

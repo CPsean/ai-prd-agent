@@ -26,10 +26,9 @@ $ARGUMENTS
 
 选 **B**：
 - 追加询问：「请提供被迭代功能的名称或 PRD ID（如不确定可跳过，后续手动补充）」
-- 记录原始 PRD 信息（标题 + ID），后续步骤中用 `templates/iteration-prd.md` 代替 `feature-prd.md`
-- 填充 YAML 的 `modifies` 和 `modifies-title` 字段
+- 记录原始 PRD 信息（标题 + ID），后续步骤中仍使用 `templates/feature-prd.md`，但在 YAML 的 `modifies` 和 `modifies-title` 字段中注明被迭代的原始功能
+- 在 §1 元数据和 §2 背景章节注明"本 PRD 为迭代优化，变更范围请参见变更描述"
 
-类型直接为 `iteration` 时，视同选 B，直接询问被迭代的原始功能。
 类型为 `story-card` 或 `epic` 时，跳过本步骤。
 
 **0.5 读取作者信息**
@@ -68,8 +67,7 @@ $ARGUMENTS
 
 a. `prd.md` — 从对应模板复制：
    - story-card → `templates/story-card.md`
-   - feature（新功能）→ `templates/feature-prd.md`
-   - feature（迭代优化）/ iteration → `templates/iteration-prd.md`
+   - feature（新功能或迭代优化）→ `templates/feature-prd.md`
    - epic → `templates/epic-prd.md`
 
    替换模板占位符：
