@@ -335,7 +335,7 @@ AI PRD/
 
 | 命令 | 用途 |
 |------|------|
-| `/new-prd [story-card\|feature\|iteration\|epic] [标题]` | 新建 PRD，自动读取 RDD 草稿（如有），含两轮细节澄清 |
+| `/new-prd [story-card\|feature\|epic] [标题]` | 新建 PRD，自动读取 RDD 草稿（如有），含两轮细节澄清；feature 类型过程中可选新功能或迭代优化模板 |
 | `/update-prd [标题] [变更描述]` | 更新 PRD，自动归档旧版本并写 changelog |
 | `/prd-summary [标题或ID]` | 输出 PRD 对齐摘要，适合评审前使用 |
 | `/prd-qa [问题]` | 基于 PRD 回答问题（意图识别 → 四层检索 → 来源标注） |
@@ -357,15 +357,14 @@ AI PRD/
 
 ---
 
-## PRD 四层体系
+## PRD 三层体系
 
 根据需求规模选择对应类型：
 
 | 类型 | 命令参数 | 适用场景 | 模板 |
 |------|---------|----------|------|
 | 用户故事卡 | `story-card` | 单场景小需求、子故事 | `templates/story-card.md` |
-| 功能 PRD | `feature` | 一个完整功能模块 | `templates/feature-prd.md` |
-| 迭代 PRD | `iteration` | 对已有功能的优化或局部调整 | `templates/iteration-prd.md` |
+| 功能 PRD | `feature` | 一个完整功能模块（新功能）或对已有功能的迭代优化（过程中选模板） | `templates/feature-prd.md` / `templates/iteration-prd.md` |
 | 史诗 PRD | `epic` | 大型项目，含多个功能 | `templates/epic-prd.md` |
 
 ---
@@ -405,5 +404,3 @@ AI PRD/
 | 2026-04-10 | v4.1 | 新增 `/generate-page-spec`、`/sync-docs` 命令；新增迭代 PRD 模板（`iteration`）；`/new-prd` 支持迭代类型识别；串联流水线打通（RDD → PRD 自动衔接） |
 | 2026-04-15 | v4.2 | PRD 输出质量升级：Feature PRD 重写为 §1-§11 完整结构，含功能清单（§7）和逐功能展开（§8）；新增 `context/business-glossary.md` 和 `context/product-feature-map.md` 联动维护机制 |
 | 2026-04-16 | v5.0 | `/requirement-clarifier` 重构为两阶段流程（Phase 1 用户故事 → Phase 2 RDD），支持中断续接；路由规则升级为客观信号检查，默认走需求澄清路径；CLAUDE.md 瘦身（非运行时内容迁移至 `docs/`） |
-| 2026-04-20 | v5.1 | 数据飞轮行为准则：将 context 文件与 PRD 的双向联动从命令步骤提升为全局行为准则；新增 `rules/data-flywheel.md`（触发条件表、新术语/新功能节点认定标准、强制规则、一致性检查扩展）；CLAUDE.md 新增"数据飞轮准则"章节；`rules/` 读取规则表补入 data-flywheel.md |
-| 2026-04-23 | v5.2 | TDD 对齐 F-004~F-008：路由纠错流程、`/import-context` 新命令（截图库+按需分类）、原型生成规格卡阻断（PROTO-PRE-001）+ 视觉风格提取（PROTO-STY-001）、`/sync-docs` 两块报告+飞轮检测（SYNC-FLY-001）、`/prd-qa` 意图识别+四层检索+来源标注（KQA-QRY-002）、技能管理三级质检门控（SKL-QC-001）；集成测试扩展至 9 场景 19 用例 |
