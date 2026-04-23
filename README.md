@@ -297,8 +297,8 @@ npm install -g @anthropic-ai/claude-code
 ```
 AI PRD/
 ├── .claude/                        # Claude Code 配置中心
-│   ├── commands/                   # 斜杠命令（/new-prd、/prd-qa 等）
-│   └── skills/                     # AI 技能包（jobs-to-be-done、user-story 等）
+│   ├── commands/                   # 斜杠命令（/new-prd、/prd-qa、/import-context 等）
+│   └── skills/                     # AI 技能包（jobs-to-be-done、user-story 等；支持自建技能）
 ├── context/                        # 产品上下文（首次使用时建立）
 │   ├── product-background.md       # 产品背景（定位、产品线、架构、术语）← Step 1.1
 │   ├── product-strategy.md         # 产品策略（原则、优先级、边界）← Step 1.2
@@ -338,10 +338,11 @@ AI PRD/
 | `/new-prd [story-card\|feature\|iteration\|epic] [标题]` | 新建 PRD，自动读取 RDD 草稿（如有），含两轮细节澄清 |
 | `/update-prd [标题] [变更描述]` | 更新 PRD，自动归档旧版本并写 changelog |
 | `/prd-summary [标题或ID]` | 输出 PRD 对齐摘要，适合评审前使用 |
-| `/prd-qa [问题]` | 基于 PRD 回答问题（产品/研发/测试均可用） |
+| `/prd-qa [问题]` | 基于 PRD 回答问题（意图识别 → 四层检索 → 来源标注） |
 | `/generate-page-spec [标题]` | 从 PRD 提取页面规格卡（原型生成的前置步骤） |
-| `/generate-prototype [标题]` | 从页面规格卡（优先）或 PRD 生成可交互 HTML 原型 |
-| `/sync-docs [标题]` | 核查 PRD、页面规格卡、原型的一致性，列出差异和建议操作 |
+| `/generate-prototype [标题]` | 从页面规格卡生成可交互 HTML 原型（无规格卡时阻断） |
+| `/sync-docs [标题]` | 核查 PRD、页面规格卡、原型的一致性；检测飞轮待处理项 |
+| `/import-context [内容]` | 导入产品背景/术语/截图等上下文，AI 分类建议后确认写入 |
 | `/ingest-prd` | 录入历史 PRD，自动重建结构、更新注册表和需求清单 |
 
 ### 需求分析
@@ -405,3 +406,4 @@ AI PRD/
 | 2026-04-15 | v4.2 | PRD 输出质量升级：Feature PRD 重写为 §1-§11 完整结构，含功能清单（§7）和逐功能展开（§8）；新增 `context/business-glossary.md` 和 `context/product-feature-map.md` 联动维护机制 |
 | 2026-04-16 | v5.0 | `/requirement-clarifier` 重构为两阶段流程（Phase 1 用户故事 → Phase 2 RDD），支持中断续接；路由规则升级为客观信号检查，默认走需求澄清路径；CLAUDE.md 瘦身（非运行时内容迁移至 `docs/`） |
 | 2026-04-20 | v5.1 | 数据飞轮行为准则：将 context 文件与 PRD 的双向联动从命令步骤提升为全局行为准则；新增 `rules/data-flywheel.md`（触发条件表、新术语/新功能节点认定标准、强制规则、一致性检查扩展）；CLAUDE.md 新增"数据飞轮准则"章节；`rules/` 读取规则表补入 data-flywheel.md |
+| 2026-04-23 | v5.2 | TDD 对齐 F-004~F-008：路由纠错流程、`/import-context` 新命令（截图库+按需分类）、原型生成规格卡阻断（PROTO-PRE-001）+ 视觉风格提取（PROTO-STY-001）、`/sync-docs` 两块报告+飞轮检测（SYNC-FLY-001）、`/prd-qa` 意图识别+四层检索+来源标注（KQA-QRY-002）、技能管理三级质检门控（SKL-QC-001）；集成测试扩展至 9 场景 19 用例 |

@@ -33,6 +33,14 @@ $ARGUMENTS
 - 根据 `$ARGUMENTS` 的描述，精确修改 `prd.md` 中对应的章节内容
 - 只改需要改的部分，不重写整个文件
 
+**3.5. 领域检查清单扫描（条件触发）**
+
+检查 `context/domain-checklists.md` 是否存在：
+- **不存在**：输出提示「未检测到领域检查清单配置，如需启用可运行 /init 或手动创建 context/domain-checklists.md」，静默跳过
+- **存在**：读取注册表（最多 10 行，超出警告并跳过），筛选 `扫描时机` 含 `update-prd` 的行，将变更描述（`$ARGUMENTS`）及已读取的 `prd.md` 内容与各行触发关键词逐一匹配：
+  - **命中**（按需加载，每次执行最多触发 3 个清单）：读取对应清单文件（建议 ≥ 3 条检查项、≤ 150 行），执行扫描，在继续后续步骤前输出领域影响结论块（格式：有影响 / 无影响 / 待确认）
+  - **未命中**：静默跳过
+
 **4. 更新 YAML**
 - `version`：小版本号 +0.1（如 1.1 → 1.2）；若本次是重大重构则升主版本（1.x → 2.0）
 - `updated`：今天日期
@@ -67,6 +75,12 @@ $ARGUMENTS
 读取 PRD YAML，若 `has-page-spec: true` 或 `has-prototype: true`，在输出确认后追加：
 
 > PRD 已更新至 v[新版本]。如本次变更影响页面或交互，建议运行 `/sync-docs [标题]` 检查关联文档是否需要同步。
+
+**原型过期提示（PROTO-LNK-001）**：额外检查 `outputs/prototypes/[标题]/prototype-meta.md` 是否存在：
+- **存在**：读取 `prd-version` 字段，与 PRD 新版本比较，追加：
+  > ⚠️ 该 PRD 关联了原型（版本 [关联版本]），当前 PRD 已更新至 [新版本]，建议检查原型是否需要同步更新：`/generate-prototype [标题]` 重新生成，或 `/sync-docs [标题]` 检查差异。
+- **不存在但 `has-prototype: true`**：追加：
+  > ⚠️ 该 PRD 关联了原型但版本信息缺失，建议重新运行 `/generate-prototype [标题]` 生成。
 
 **8. context 文件同步检查（仅正式区 PRD，且类型为 feature 或 epic 时执行）**
 
