@@ -404,3 +404,4 @@ AI PRD/
 | 2026-04-10 | v4.1 | 新增 `/generate-page-spec`、`/sync-docs` 命令；新增迭代 PRD 模板（`iteration`）；`/new-prd` 支持迭代类型识别；串联流水线打通（RDD → PRD 自动衔接） |
 | 2026-04-15 | v4.2 | PRD 输出质量升级：Feature PRD 重写为 §1-§11 完整结构，含功能清单（§7）和逐功能展开（§8）；新增 `context/business-glossary.md` 和 `context/product-feature-map.md` 联动维护机制 |
 | 2026-04-16 | v5.0 | `/requirement-clarifier` 重构为两阶段流程（Phase 1 用户故事 → Phase 2 RDD），支持中断续接；路由规则升级为客观信号检查，默认走需求澄清路径；CLAUDE.md 瘦身（非运行时内容迁移至 `docs/`） |
+| 2026-04-20 | v5.1 | 数据飞轮行为准则：将 context 文件与 PRD 的双向联动从命令步骤提升为全局行为准则；新增 `rules/data-flywheel.md`（触发条件表、新术语/新功能节点认定标准、强制规则、一致性检查扩展）；CLAUDE.md 新增"数据飞轮准则"章节；`rules/` 读取规则表补入 data-flywheel.md |
