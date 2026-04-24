@@ -20,51 +20,84 @@ $ARGUMENTS
 - 查 `prds/_registry.md` 定位 PRD 路径
 - **未在注册表中找到时**：停止执行，告知用户：
   > "该 PRD 尚未移入正式区（prds/），无法生成原型。请先确认发布后再运行此命令。"
-- **优先读取页面规格卡**：检查 `prds/[标题]/page-spec.md` 是否存在
-  - **存在**：以页面规格卡为主要输入，从中提取页面列表、区块结构、状态定义与操作说明
-  - **不存在**：回退读取 `prd.md` 的"页面 & 交互说明"章节，并提示：
-    > "未找到页面规格卡，将直接基于 PRD 生成原型。建议先运行 `/generate-page-spec [标题]` 以提升原型准确性。"
 
-**2. 规划原型结构**
-- 每个 PRD 页面 = 原型中的一个独立 section（id 对应页面名称）
-- 制作页面间的导航（顶部 Tab 或侧边栏）
+**1.5 前置检测：页面规格卡存在性（PROTO-PRE-001）**
+
+按优先级检查 page-spec.md（路径从步骤 1 的 registry 定位结果推导）：
+1. PRD 所在目录下的 `page-spec.md`（正式区优先）
+2. `drafts/` 对应目录下的 `page-spec.md`（草稿区）
+
+- **存在**：以页面规格卡为主要输入，从中提取页面列表、区块结构、状态定义与操作说明
+- **存在但内容为空**：阻断，提示「页面规格卡内容为空，建议重新运行 `/generate-page-spec [标题]`」
+- **均不存在**：**阻断执行**，输出：
+  > "未找到「[标题]」的页面规格卡，请先运行 `/generate-page-spec [标题]` 生成规格卡后再生成原型。"
+  
+  **不**回退读取 PRD 继续生成。
+
+**2. 截图库视觉风格提取（PROTO-STY-001）**
+
+根据规格卡涉及的功能模块，检查 `context/screenshots/[对应模块]/`：
+
+- **截图存在**：读取截图，提取视觉特征（主色调、次要颜色、字体风格、间距风格、组件样式），将提取结果应用到原型 CSS
+- **截图库为空或不存在**：以通用线框风格生成原型，追加提示：
+  > "截图库暂无对应模块截图，以线框模式生成。建议运行 `/import-context` 补充截图以提升还原度。"
+
+**3. 规划原型结构**
+- 每个规格卡页面 = 原型中的一个独立 HTML 文件
+- 制作 index.html 作为原型入口，包含页面导航
+- **新功能区域**：在现有布局基础上，新增功能区域用视觉方式标注（如虚线框 + 「新增」标签）
+- **页面数量超 20**：优先生成核心流程页面（≤10 页），其余以占位页面代替，标注「[待补充]」
 - 输出规划清单，让用户确认后再生成代码
 
-**3. 生成 `prototype/index.html`**
+**4. 冲突检测**
+
+检查 `outputs/prototypes/[标题]/` 是否已存在：
+- **已存在**：询问 PM 是否覆盖已有原型，或生成至新路径（追加日期后缀），等待确认
+- **不存在**：继续执行
+
+**5. 生成 HTML 原型（PROTO-GEN-003）**
 
 技术规范：
 - 纯 HTML + CSS + 原生 JS，不依赖外部框架和 CDN
-- 样式：简洁商务风，灰白为主，蓝色作为主色调
-- 页面切换：Tab 式导航，点击切换展示对应 section
-- 表单元素：使用真实 input/select/button，支持基础交互（填写、点击、切换状态）
+- 样式：优先使用步骤 2 提取的产品视觉风格；截图库为空时使用通用线框风格
+- 每个页面独立 HTML 文件，index.html 为入口含页面导航
+- **页面跳转**：按钮/链接点击后跳转到规格卡中定义的目标页面（独立文件间跳转）
+- **基础表单交互**：输入框可输入（含 placeholder）、下拉可选择（含选项列表）、按钮可点击（含 hover 状态）
+- **新功能标注**：新增功能区域用虚线框 + 「新增」标签标注
 - 状态展示：包含空状态、加载态、错误态的 UI 占位
 - PRD 引用：每个页面底部有折叠区"对应 PRD 章节"，显示该页面的验收标准
+- 不包含任何真实业务数据（硬编码 mock 数据仅用于展示）
 
 文件结构：
 ```
-prototype/
-  index.html     ← 所有页面合并在单文件中，通过 JS 切换显示
+outputs/prototypes/[标题]/
+  index.html           ← 原型入口，含页面导航
+  [页面名1].html       ← 各页面独立文件
+  [页面名2].html
+  ...
+  prototype-meta.md    ← 版本关联元数据
 ```
 
-**4. 更新元数据**
+**6. 创建版本关联元数据（PROTO-LNK-001）**
 
-在 `prototype/index.html` 的 `<head>` 标签内插入生成记录注释：
+在 `outputs/prototypes/[标题]/` 目录创建 `prototype-meta.md`：
 
-```html
-<!--
-  generated-from-prd-version: [PRD 当前 version]
-  generated-from-page-spec: [page-spec.md 的 source-prd-version，若无则填 N/A]
-  generated-date: [今天日期]
--->
+```yaml
+---
+prd-id: [PRD-ID]
+prd-version: [当前 PRD version 字段值]
+generated-at: [今天日期]
+page-spec-version: [规格卡 version，无则填 N/A]
+---
 ```
 
 同步更新 `prd.md` 的 YAML：
 - `has-prototype` 改为 `true`
-- `prototype-path` 改为 `prototype/index.html`
+- `prototype-path` 改为 `outputs/prototypes/[标题]/index.html`
 
-**5. 输出确认**
+**7. 输出确认**
 - 告知用户原型文件路径
 - 列出生成了哪些页面
-- 提示：直接用浏览器打开 `prototype/index.html` 即可预览
+- 提示：直接用浏览器打开 `outputs/prototypes/[标题]/index.html` 即可预览
 - 若有关联 page-spec，附加提示：
   > 如后续 PRD 或页面规格有变更，可运行 `/sync-docs [标题]` 检查文档一致性。

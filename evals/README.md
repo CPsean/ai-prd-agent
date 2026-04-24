@@ -22,6 +22,8 @@ evals/
     TC-design-solution.md
     TC-write-user-story.md
     TC-design-data-model.md
+    TC-abandon-prd.md
+    TC-prd-migrate.md
   quality-gates/          ← 质检规则测试（验证规则能否正确识别问题）
     QG-pass-cases.md
     QG-fail-cases.md
@@ -36,16 +38,16 @@ evals/
 1. 打开一个**新的 Claude Code 对话**（避免上下文污染）
 2. 复制测试用例的"测试输入"部分，粘贴到对话框执行
 3. 对照"检查要点"逐条判断输出是否符合预期
-4. 在用例状态表的 **`Claude Code 状态`** 行记录结果
+4. 在用例的**状态列**记录结果
 
-### Codex Agent
+### OpenAI Codex
 
-1. 打开一个**新的 Codex Agent 对话**（确保工作目录为本仓库根目录）
-2. 使用各 TC 文件中 **`Codex 等效输入`** 对应的自然语言描述执行
-3. 对照相同的"检查要点"逐条判断（文件操作结果与平台无关）
-4. 在用例状态表的 **`Codex 状态`** 行记录结果
+1. 在 Codex 环境中打开项目
+2. 使用 TC 文件中 `Codex 等效输入` 标注的自然语言触发
+3. 对照"检查要点"逐条判断输出是否符合预期
+4. 在用例的 **Codex 状态** 行记录结果
 
-**状态符号**（两平台通用）：
+### 状态符号
 
 | 符号 | 含义 |
 |------|------|
@@ -73,6 +75,11 @@ evals/
 | `TC-DS-` | /design-solution 命��测试 |
 | `TC-WS-` | /write-user-story 命令测试 |
 | `TC-DM-` | /design-data-model 命令测试 |
+| `TC-AP-` | /abandon-prd 命令测试 |
+| `TC-CTX-` | /import-context 命令测试 |
+| `TC-CMD-` | 命令路由测试 |
+| `TC-SM-` | 技能管理测试 |
+| `TC-MIG-` | 存量迁移测试 |
 | `QG-P-` | 质检通过用例 |
 | `QG-F-` | 质检失败用例（预期触发特定质检项） |
 
@@ -83,4 +90,3 @@ evals/
 - 命令逻辑变更后，对应 TC 文件需同步更新"预期行为"
 - 质检规则新增条目后，在 `QG-fail-cases.md` 补充对应失败用例
 - 每次运行结果记录在用例状态列，不需要另建报告文件
-- 新增命令时，TC 文件需同时提供"测试输入"（斜杠命令）和"Codex 等效输入"（自然语言）两种格式

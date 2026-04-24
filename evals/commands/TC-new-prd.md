@@ -2,7 +2,7 @@
 
 > 关联命令：`.claude/commands/new-prd.md`
 > 前置条件：`prds/_registry.md` 存在且已初始化
-> Codex 等效输入：「新建一个 [story-card/feature/epic] PRD，标题为 [标题]」或「帮我起草 [标题] 的功能需求文档」
+> Codex 等效输入：「新建功能PRD：[标题]」或「帮我起草[标题]的功能需求文档」
 
 ---
 
@@ -11,6 +11,7 @@
 | 字段 | 内容 |
 |------|------|
 | **状态** | ✅ 2026-04-10 |
+| **Codex 状态** | — |
 | **测试目标** | 验证基础创建流程：文件创建在 drafts/，registry 暂不更新，结束时询问是否发布 |
 | **前置条件** | registry 中当前无 SC 类型 PRD（或最大编号已知） |
 
@@ -45,7 +46,9 @@
 | 字段 | 内容 |
 |------|------|
 | **状态** | — |
+| **Codex 状态** | — |
 | **状态** | ✅ 2026-04-10 |
+| **Codex 状态** | — |
 | **测试目标** | 验证有上下文时 AI 自动填充内容，按需生成 fields.md，结束后询问是否发布 |
 | **前置条件** | registry 中当前无 F 类型 PRD |
 
@@ -82,6 +85,7 @@
 | 字段 | 内容 |
 |------|------|
 | **状态** | ✅ 2026-04-10 |
+| **Codex 状态** | — |
 | **测试目标** | 验证缺少类型时 AI 主动询问，不自行假设 |
 | **前置条件** | 无特殊前置条件 |
 
@@ -107,6 +111,7 @@
 | 字段 | 内容 |
 |------|------|
 | **状态** | ⚠️ 2026-04-10 |
+| **Codex 状态** | — |
 | **测试目标** | 验证 drafts/ 和 prds/ 任一存在同名文件夹时 AI 不覆盖，提示用户 |
 | **前置条件** | `drafts/用户登录失败提示优化/` 已存在（执行 TC-NP-01 后）或 `prds/用户登录失败提示优化/` 已存在 |
 
@@ -133,6 +138,7 @@
 | 字段 | 内容 |
 |------|------|
 | **状态** | ✅ 2026-04-10 |
+| **Codex 状态** | — |
 | **测试目标** | 验证确认发布后：文件移入 prds/，registry 注册，drafts/ 原文件夹删除 |
 | **前置条件** | TC-NP-01 执行后，`drafts/用户登录失败提示优化/` 存在 |
 
@@ -160,7 +166,8 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | ✅ 2026-04-10 |
-| **测试目标** | 验证 feature 类型时步骤 0 会询问新功能/迭代，选 B 后使用 iteration-prd 模板，并询问被迭代原始功能 |
+| **Codex 状态** | — |
+| **测试目标** | 验证 feature 类型时步骤 0 会询问新功能/迭代，选 B 后使用 feature-prd 模板并在 YAML 中注明被迭代原始功能 |
 | **前置条件** | 无特殊前置条件 |
 
 **测试输入**
@@ -179,15 +186,15 @@ B
 **预期行为**
 1. 创建文件后，步骤 0 主动询问：新功能 or 迭代优化？
 2. 用户选 B → 追加询问：被迭代的原始功能名称/ID
-3. 用户提供后 → 使用 `templates/iteration-prd.md` 生成 prd.md
+3. 用户提供后 → 使用 `templates/feature-prd.md` 生成 prd.md
 4. prd.md 的 YAML 中包含 `modifies: F-001` 和 `modifies-title: 消息推送设置`
-5. type 字段值为 `iteration`（而非 feature）
+5. §1 元数据或 §2 背景章节注明"本 PRD 为迭代优化"
 
 **检查要点**
 - [ ] AI 在步骤 0 输出了 A/B 选项（新功能 / 迭代优化）
 - [ ] 选 B 后进一步询问被迭代功能
-- [ ] `drafts/消息推送频率控制/prd.md` 使用了迭代模板结构（含"变更前→变更后"或"只写变化部分"格式）
-- [ ] `prd.md` frontmatter 中包含 `modifies: F-001`
+- [ ] `drafts/消息推送频率控制/prd.md` 使用 feature-prd 模板，frontmatter 包含 `modifies: F-001`
+- [ ] §1 或 §2 中有迭代说明文字
 - [ ] `prd.md` frontmatter 中包含 `modifies-title: 消息推送设置`
 - [ ] `type` 字段为 `iteration`
 
@@ -198,6 +205,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | ✅ 2026-04-10 |
+| **Codex 状态** | — |
 | **测试目标** | 验证类型直接为 iteration 时，视同选 B，直接询问被迭代原始功能，不再走 A/B 选项 |
 | **前置条件** | 无特殊前置条件 |
 
@@ -223,6 +231,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | ✅ 2026-04-10 |
+| **Codex 状态** | — |
 | **测试目标** | 验证草稿内容填充后，AI 自动进入细节澄清轮次，每轮 ≤3 问，用户回答后更新 prd.md，收敛后输出明确信号 |
 | **前置条件** | 无特殊前置条件 |
 
@@ -256,6 +265,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | ✅ 2026-04-10 |
+| **Codex 状态** | — |
 | **测试目标** | 验证 PRD 移入 prds/ 后，AI 读取内容判断涉及页面变更，并引导运行 generate-page-spec 和 generate-prototype |
 | **前置条件** | `drafts/消息推送设置/prd.md` 已填充，含"页面 & 交互说明"实质内容；AI 刚完成 A/B 询问等待用户确认 |
 
@@ -286,6 +296,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | ✅ 2026-04-10 |
+| **Codex 状态** | — |
 | **测试目标** | 验证纯逻辑类 PRD 移入正式区后，AI 正确判断无需生成页面规格和原型 |
 | **前置条件** | `drafts/推送频率限流规则/prd.md` 已填充，为纯业务规则类需求，无页面章节 |
 
@@ -314,6 +325,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | ✅ 2026-04-13 |
+| **Codex 状态** | — |
 | **测试目标** | 验证 `context/workspace-config.md` 不存在或 author 为占位符时，AI 主动引导用户填写，并保存到配置文件 |
 | **前置条件** | `context/workspace-config.md` 不存在，或文件中 `author: your-name` 未修改 |
 
@@ -343,6 +355,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | — |
+| **Codex 状态** | — |
 | **测试目标** | 验证 §7 功能清单生成时，AI 先查 product-feature-map.md 前缀映射表，已有前缀复用，新模块才推导 |
 | **前置条件** | `context/product-feature-map.md` 存在，前缀映射表已有"消息推送"模块 → `MSG` 前缀 |
 
@@ -388,6 +401,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | — |
+| **Codex 状态** | — |
 | **测试目标** | 验证 feature PRD 的 §8 每个功能子节中，§8.x.1-§8.x.3 已填写，§8.x.4 有分支时填 Mermaid，无分支时填「不涉及」 |
 | **前置条件** | 无特殊前置条件 |
 
@@ -420,6 +434,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | — |
+| **Codex 状态** | — |
 | **测试目标** | 验证 feature PRD 移入 prds/ 后，AI 从 §5 提取新功能节点，提议更新 product-feature-map.md |
 | **前置条件** | `context/product-feature-map.md` 存在；`drafts/消息推送设置/prd.md` 含 §5 新功能节点；AI 等待 A/B 确认 |
 
@@ -453,6 +468,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | ✅ 2026-04-13 |
+| **Codex 状态** | — |
 | **测试目标** | 验证 `author` 已在 workspace-config.md 中填写时，AI 静默读取并填充，不向用户重复询问 |
 | **前置条件** | `context/workspace-config.md` 存在，且 `author: 张三`（非占位符） |
 
@@ -479,6 +495,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | — |
+| **Codex 状态** | — |
 | **测试目标** | 验证 `context/platform-support.md` 存在且有已支持端时，PRD §9.4 包含各端兼容性说明 |
 | **前置条件** | `context/platform-support.md` 存在，包含"iOS App：已支持"、"Android App：已支持"、"PC Web：已支持" |
 
@@ -507,6 +524,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | — |
+| **Codex 状态** | — |
 | **测试目标** | 验证 new-prd 按章节分步加载规则：写 §4 前不读 glossary，写 §9 前不读 platform-support |
 | **前置条件** | `context/business-glossary.md` 和 `context/platform-support.md` 均存在 |
 
@@ -532,6 +550,7 @@ B
 | 字段 | 内容 |
 |------|------|
 | **状态** | — |
+| **Codex 状态** | — |
 | **测试目标** | 验证冲突检测以 prd.md 文件存在性为准，而非目录存在性；避免 requirement-clarifier → new-prd 串联工作流被误判为冲突而阻断 |
 | **前置条件** | `drafts/批量导出功能/rdd.md` 已存在（由 `/requirement-clarifier` 创建），但 `drafts/批量导出功能/prd.md` **不存在** |
 
@@ -555,29 +574,178 @@ B
 
 ---
 
-## TC-NP-X 领域检查清单触发（domain-checklists.md 存在且命中）
+## TC-NP-19 文件夹命名含 ID 前缀（F-009 PRD-GEN-008）
 
 | 字段 | 内容 |
 |------|------|
 | **状态** | — |
 | **Codex 状态** | — |
-| **测试目标** | 验证 Step 5-1：需求内容命中 domain-checklists.md 关键词时，在填充 PRD 内容前输出领域影响结论块 |
-| **前置条件** | `context/domain-checklists.md` 已注册 DL-01；`drafts/印章管理/rdd.md` 已存在（status: rdd-complete） |
+| **测试目标** | 验证 `/new-prd` 创建草稿时文件夹采用 `[ID]-[标题]/` 格式，与 `/ingest-prd` 对齐 |
+| **前置条件** | `prds/_registry.md` 当前最大 F 编号已知；`drafts/` 中无同名目录 |
 
 **测试输入**
 ```
-/new-prd feature 印章管理
+/new-prd feature 测试功能A
 ```
 
 **预期行为**
-1. Step 5-0 读取 rdd.md，status 为 rdd-complete，正常继续
-2. Step 5-1 检测 `context/domain-checklists.md` 存在，读取注册表
-3. rdd.md 内容含"印章" → 命中 DL-01 → 读取 signing-special-scenarios.md
-4. 在填充 PRD 各章节**之前**输出"特殊场景影响扫描"结论表
-5. 用户确认后继续填充 PRD 内容
+1. 分配新 ID（如 F-009）
+2. 创建目录 `drafts/F-009-测试功能A/`（而非 `drafts/测试功能A/`）
+3. 在该目录下创建 prd.md、CHANGELOG.md、archive/
+4. 输出确认信息中的路径包含 ID 前缀
 
 **检查要点**
-- [ ] 结论表在 PRD 内容填充前输出
-- [ ] 结论表包含 5 个场景行（SC-SS-01 至 SC-SS-05）
-- [ ] 用户确认后 PRD 正常填充
-- [ ] domain-checklists.md 不存在时输出提示并跳过，PRD 正常生成
+- [ ] 文件路径：`drafts/F-009-测试功能A/prd.md` 存在（ID 前缀格式）
+- [ ] `drafts/测试功能A/` **不存在**（旧格式目录未创建）
+- [ ] prd.md frontmatter `id` 字段与文件夹 ID 一致
+- [ ] AI 输出路径包含 `F-009-测试功能A`
+
+---
+
+## TC-NP-20 草稿创建后 ID 写入预注册表（F-009 PRD-GEN-009）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **Codex 状态** | — |
+| **测试目标** | 验证草稿创建完成后，ID 立即写入 `drafts/_draft-registry.md`，使并发操作可见 |
+| **前置条件** | `drafts/_draft-registry.md` 存在（或不存在，将自动创建） |
+
+**测试输入**
+```
+/new-prd feature 测试功能B
+```
+
+**预期行为**
+1. 草稿目录和文件创建完成后，向 `drafts/_draft-registry.md` 追加一行
+2. 条目包含：ID、标题、类型（feature）、状态（in-draft）、创建日期
+
+**检查要点**
+- [ ] `drafts/_draft-registry.md` 存在
+- [ ] 文件中包含新分配 ID 的行（如 `| F-010 | 测试功能B | feature | in-draft | 2026-04-23 |`）
+- [ ] 状态字段为 `in-draft`
+- [ ] 若预注册表不存在，AI 自动创建并写入（含表头）
+
+---
+
+## TC-NP-21 预注册表孤立条目自动清理（F-009 PRD-GEN-009 §8.3）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **Codex 状态** | — |
+| **测试目标** | 验证 `/new-prd` 执行时检测到预注册表中目录不存在的孤立条目，自动删除并输出提示 |
+| **前置条件** | `drafts/_draft-registry.md` 中有一条记录（如 F-010 测试功能B），但对应目录 `drafts/F-010-测试功能B/` 已被手动删除 |
+
+**测试输入**
+```
+/new-prd feature 测试功能C
+```
+
+**预期行为**
+1. 读取 `drafts/_draft-registry.md` 时发现 F-010 条目对应目录不存在
+2. 自动删除孤立条目，输出简短提示
+3. 分配新 ID 时已排除被清理的孤立 ID（正确使用下一个可用编号）
+4. 正常完成草稿创建
+
+**检查要点**
+- [ ] AI 输出中提及孤立条目被清理（如"检测到预注册条目 F-010 对应目录不存在，已自动清理"）
+- [ ] `drafts/_draft-registry.md` 中 F-010 行已被删除
+- [ ] 新草稿 ID 正确分配（不被孤立条目影响）
+- [ ] 新草稿正常创建
+
+---
+
+## TC-NP-22 移入正式区后 drafts/ 目录完整删除（F-009 PRD-MIG-004）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **Codex 状态** | — |
+| **测试目标** | 验证移入正式区后 `drafts/` 对应目录被完整删除（含 rdd.md 等关联文件），预注册条目也一并清理 |
+| **前置条件** | TC-NP-19 完成，`drafts/F-009-测试功能A/` 存在（含 prd.md、rdd.md、CHANGELOG.md、archive/）；`drafts/_draft-registry.md` 有对应条目 |
+
+**测试输入**
+```
+B
+```
+（接 TC-NP-19 的 A/B 发布询问，选择移入正式区）
+
+**预期行为**
+1. 将 `drafts/F-009-测试功能A/` 整体移动到 `prds/F-009-测试功能A/`
+2. 确认 `prds/F-009-测试功能A/prd.md` 存在后，删除 `drafts/F-009-测试功能A/` 原目录
+3. 从 `drafts/_draft-registry.md` 删除对应条目
+4. `prds/_registry.md` 追加行，路径列为 `prds/F-009-测试功能A/prd.md`
+5. 输出确认信息包含"草稿目录已清理"
+
+**检查要点**
+- [ ] `prds/F-009-测试功能A/` 存在，含 prd.md + rdd.md + CHANGELOG.md + archive/
+- [ ] `drafts/F-009-测试功能A/` **不存在**
+- [ ] `drafts/_draft-registry.md` 中无 F-009 条目
+- [ ] `prds/_registry.md` 新行路径为 `prds/F-009-测试功能A/prd.md`（含 ID 前缀）
+- [ ] AI 输出包含"草稿目录已清理"或同义表述
+
+---
+
+## TC-NP-23 移入正式区时 ID 冲突自动顺延（F-009 PRD-MIG-003）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **Codex 状态** | — |
+| **测试目标** | 验证移入正式区时检测到 ID 已被占用，系统自动顺延到下一个可用 ID 并更新所有文件引用 |
+| **前置条件** | 草稿 `drafts/F-009-测试功能X/` 存在，prd.md id 为 F-009；手动在 `prds/_registry.md` 中插入一条 F-009 的占位行（模拟并发冲突） |
+
+**测试输入**
+```
+B
+```
+（选择移入正式区）
+
+**预期行为**
+1. 读取 `prds/_registry.md`，检测到 F-009 已存在
+2. 自动查找下一个可用 ID（如 F-010）
+3. 更新 `prd.md` frontmatter `id` 字段为 F-010
+4. 更新 `CHANGELOG.md` 中出现的 F-009 引用
+5. 将目录从 `drafts/F-009-测试功能X/` 重命名为 `prds/F-010-测试功能X/`
+6. 在 `prds/_registry.md` 写入 F-010 行
+7. 输出提示"检测到 ID 冲突，已自动调整为 F-010"
+
+**检查要点**
+- [ ] AI 输出包含冲突提示和新 ID 说明
+- [ ] `prds/F-010-测试功能X/prd.md` 存在（新 ID 目录）
+- [ ] prd.md frontmatter `id` 字段为 F-010（已更新）
+- [ ] `prds/_registry.md` 中新行 ID 为 F-010，路径为 `prds/F-010-测试功能X/prd.md`
+- [ ] `drafts/F-009-测试功能X/` **不存在**
+- [ ] `drafts/_draft-registry.md` 中 F-009 条目已删除
+
+---
+
+## TC-NP-24 requirement-clarifier 创建的 rdd.md 在新命名格式下仍无冲突（F-009 PRD-GEN-008 衔接）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **Codex 状态** | — |
+| **测试目标** | 验证 `/requirement-clarifier` 创建的 `drafts/[标题]/rdd.md`（旧格式，无 ID 前缀）在执行 `/new-prd` 时被正确重命名，rdd.md 内容不丢失 |
+| **前置条件** | 先执行 `/requirement-clarifier` 使 `drafts/测试功能D/rdd.md` 存在（status: rdd-complete）；`drafts/测试功能D/prd.md` 不存在 |
+
+**测试输入**
+```
+/new-prd feature 测试功能D
+```
+
+**预期行为**
+1. 步骤 2 冲突检测：检查 `drafts/测试功能D/prd.md` → 不存在 → 无冲突
+2. 步骤 3 创建文件：检测到 `drafts/测试功能D/` 目录已存在（含 rdd.md）
+3. 将已有目录重命名为 `drafts/F-[NNN]-测试功能D/`
+4. 在重命名后的目录中创建 prd.md、CHANGELOG.md、archive/
+5. rdd.md 保持完整，status 仍为 rdd-complete
+6. 步骤 5-0 正常读取 rdd.md 并用于填充 PRD
+
+**检查要点**
+- [ ] `drafts/测试功能D/` **不存在**（已重命名为带 ID 前缀格式）
+- [ ] `drafts/F-[NNN]-测试功能D/rdd.md` 存在且内容完整（与重命名前一致）
+- [ ] `drafts/F-[NNN]-测试功能D/prd.md` 正常创建
+- [ ] AI **未**输出冲���阻断提示
+- [ ] prd.md 内容基于 rdd.md 填充（步骤 5-0 正常读取）

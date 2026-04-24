@@ -77,13 +77,13 @@ last-updated: [今天日期]
 ---
 ```
 
-将完整内容保存至 `prds/[标题]/page-spec.md`，并更新 `prd.md` 的 YAML frontmatter：
+将完整内容保存至 PRD 所在目录下的 `page-spec.md`（即 `prds/[ID]-[标题]/page-spec.md`），并更新 `prd.md` 的 YAML frontmatter：
 - 新增 `has-page-spec: true`
 - 新增 `page-spec-path: page-spec.md`
 
 **5. 输出确认与引导**
 
-> **页面规格卡已生成，保存至 `prds/[标题]/page-spec.md`，共覆盖 [N] 个页面对象。**
+> **页面规格卡已生成，保存至 PRD 目录下 `page-spec.md`，共覆盖 [N] 个页面对象。**
 >
 > 确认规格卡内容无误后，运行 `/generate-prototype [标题]` 生成可交互原型。
 

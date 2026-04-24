@@ -326,6 +326,8 @@ AI PRD/
 | `/generate-prototype [标题]` | 生成原型：[标题] | 页面规格卡 → 可交互 HTML 原型 |
 | `/sync-docs [标题]` | 检查文档一致性：[标题] | 核查 PRD / 规格卡 / 原型一致性 |
 | `/ingest-prd` | 录入历史PRD | 历史 PRD 归档 |
+| `/import-context [内容]` | 导入上下文：[内容] | 导入产品背景/术语/截图等 context 文件 |
+| `/abandon-prd [标题]` | 放弃草稿：[标题] | 放弃草稿并释放预注册 ID |
 
 ### 需求分析
 
@@ -337,13 +339,12 @@ AI PRD/
 
 ---
 
-## PRD 四层体系
+## PRD 三层体系
 
 | 类型 | Claude Code 参数 | Codex 说法 | 适用场景 |
 |------|----------------|-----------|---------|
 | 用户故事卡 | `story-card` | 新建故事卡 | 单场景小需求 |
-| 功能 PRD | `feature` | 新建功能PRD | 一个完整功能模块 |
-| 迭代 PRD | `iteration` | 迭代优化 | 对已有功能的优化调整 |
+| 功能 PRD | `feature` | 新建功能PRD | 一个完整功能模块（迭代优化也走此类型） |
 | 史诗 PRD | `epic` | 新建 Epic PRD | 大型项目，含多个功能 |
 
 ---
@@ -377,3 +378,5 @@ AI PRD/
 | 2026-04-15 | v4.2 | Feature PRD 升级为 §1-§11 完整结构；新增 business-glossary、product-feature-map 联动维护 |
 | 2026-04-16 | v5.0 | `/requirement-clarifier` 两阶段重构；路由规则客观信号化；CLAUDE.md 瘦身 |
 | 2026-04-20 | v5.1 | 数据飞轮行为准则（rules/data-flywheel.md）；新增 OpenAI Codex Agent 支持（AGENTS.md）；README 双平台说明 |
+| 2026-04-22 | v5.2 | F-003~F-008 全面落地：import-context 命令、命令路由增强、原型生成规格卡阻断、文档同步内容级对比、prd-qa 四层检索、技能管理三级质检 |
+| 2026-04-23 | v5.3 | F-009 PRD 生命周期一致性：[ID]-[标题] 目录规范、草稿预注册表、abandon-prd 命令、废弃 iteration-prd 模板 |
