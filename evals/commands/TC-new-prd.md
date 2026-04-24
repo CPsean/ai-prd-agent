@@ -551,3 +551,175 @@ B
 - [ ] `drafts/批量导出功能/rdd.md` 原文件**保持不变**（未被覆盖）
 - [ ] Step 5-0 输出包含"需求分析尚未完成"提示
 - [ ] 提示中的状态显示为 `story-confirmed`
+
+---
+
+## TC-NP-19 文件夹命名含 ID 前缀（F-009 PRD-GEN-008）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 `/new-prd` 创建草稿时文件夹采用 `[ID]-[标题]/` 格式，与 `/ingest-prd` 对齐 |
+| **前置条件** | `prds/_registry.md` 当前最大 F 编号已知；`drafts/` 中无同名目录 |
+
+**测试输入**
+```
+/new-prd feature 测试功能A
+```
+
+**预期行为**
+1. 分配新 ID（如 F-009）
+2. 创建目录 `drafts/F-009-测试功能A/`（而非 `drafts/测试功能A/`）
+3. 在该目录下创建 prd.md、CHANGELOG.md、archive/
+4. 输出确认信息中的路径包含 ID 前缀
+
+**检查要点**
+- [ ] 文件路径：`drafts/F-009-测试功能A/prd.md` 存在（ID 前缀格式）
+- [ ] `drafts/测试功能A/` **不存在**（旧格式目录未创建）
+- [ ] prd.md frontmatter `id` 字段与文件夹 ID 一致
+- [ ] AI 输出路径包含 `F-009-测试功能A`
+
+---
+
+## TC-NP-20 草稿创建后 ID 写入预注册表（F-009 PRD-GEN-009）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证草稿创建完成后，ID 立即写入 `drafts/_draft-registry.md`，使并发操作可见 |
+| **前置条件** | `drafts/_draft-registry.md` 存在（或不存在，将自动创建） |
+
+**测试输入**
+```
+/new-prd feature 测试功能B
+```
+
+**预期行为**
+1. 草稿目录和文件创建完成后，向 `drafts/_draft-registry.md` 追加一行
+2. 条目包含：ID、标题、类型（feature）、状态（in-draft）、创建日期
+
+**检查要点**
+- [ ] `drafts/_draft-registry.md` 存在
+- [ ] 文件中包含新分配 ID 的行（如 `| F-010 | 测试功能B | feature | in-draft | 2026-04-23 |`）
+- [ ] 状态字段为 `in-draft`
+- [ ] 若预注册表不存在，AI 自动创建并写入（含表头）
+
+---
+
+## TC-NP-21 预注册表孤立条目自动清理（F-009 PRD-GEN-009 §8.3）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 `/new-prd` 执行时检测到预注册表中目录不存在的孤立条目，自动删除并输出提示 |
+| **前置条件** | `drafts/_draft-registry.md` 中有一条记录（如 F-010 测试功能B），但对应目录 `drafts/F-010-测试功能B/` 已被手动删除 |
+
+**测试输入**
+```
+/new-prd feature 测试功能C
+```
+
+**预期行为**
+1. 读取 `drafts/_draft-registry.md` 时发现 F-010 条目对应目录不存在
+2. 自动删除孤立条目，输出简短提示
+3. 分配新 ID 时已排除被清理的孤立 ID（正确使用下一个可用编号）
+4. 正常完成草稿创建
+
+**检查要点**
+- [ ] AI 输出中提及孤立条目被清理（如"检测到预注册条目 F-010 对应目录不存在，已自动清理"）
+- [ ] `drafts/_draft-registry.md` 中 F-010 行已被删除
+- [ ] 新草稿 ID 正确分配（不被孤立条目影响）
+- [ ] 新草稿正常创建
+
+---
+
+## TC-NP-22 移入正式区后 drafts/ 目录完整删除（F-009 PRD-MIG-004）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证移入正式区后 `drafts/` 对应目录被完整删除（含 rdd.md 等关联文件），预注册条目也一并清理 |
+| **前置条件** | TC-NP-19 完成，`drafts/F-009-测试功能A/` 存在（含 prd.md、rdd.md、CHANGELOG.md、archive/）；`drafts/_draft-registry.md` 有对应条目 |
+
+**测试输入**
+```
+B
+```
+（接 TC-NP-19 的 A/B 发布询问，选择移入正式区）
+
+**预期行为**
+1. 将 `drafts/F-009-测试功能A/` 整体移动到 `prds/F-009-测试功能A/`
+2. 确认 `prds/F-009-测试功能A/prd.md` 存在后，删除 `drafts/F-009-测试功能A/` 原目录
+3. 从 `drafts/_draft-registry.md` 删除对应条目
+4. `prds/_registry.md` 追加行，路径列为 `prds/F-009-测试功能A/prd.md`
+5. 输出确认信息包含"草稿目录已清理"
+
+**检查要点**
+- [ ] `prds/F-009-测试功能A/` 存在，含 prd.md + rdd.md + CHANGELOG.md + archive/
+- [ ] `drafts/F-009-测试功能A/` **不存在**
+- [ ] `drafts/_draft-registry.md` 中无 F-009 条目
+- [ ] `prds/_registry.md` 新行路径为 `prds/F-009-测试功能A/prd.md`（含 ID 前缀）
+- [ ] AI 输出包含"草稿目录已清理"或同义表述
+
+---
+
+## TC-NP-23 移入正式区时 ID 冲突自动顺延（F-009 PRD-MIG-003）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证移入正式区时检测到 ID 已被占用，系统自动顺延到下一个可用 ID 并更新所有文件引用 |
+| **前置条件** | 草稿 `drafts/F-009-测试功能X/` 存在，prd.md id 为 F-009；手动在 `prds/_registry.md` 中插入一条 F-009 的占位行（模拟并发冲突） |
+
+**测试输入**
+```
+B
+```
+（选择移入正式区）
+
+**预期行为**
+1. 读取 `prds/_registry.md`，检测到 F-009 已存在
+2. 自动查找下一个可用 ID（如 F-010）
+3. 更新 `prd.md` frontmatter `id` 字段为 F-010
+4. 更新 `CHANGELOG.md` 中出现的 F-009 引用
+5. 将目录从 `drafts/F-009-测试功能X/` 重命名为 `prds/F-010-测试功能X/`
+6. 在 `prds/_registry.md` 写入 F-010 行
+7. 输出提示"检测到 ID 冲突，已自动调整为 F-010"
+
+**检查要点**
+- [ ] AI 输出包含冲突提示和新 ID 说明
+- [ ] `prds/F-010-测试功能X/prd.md` 存在（新 ID 目录）
+- [ ] prd.md frontmatter `id` 字段为 F-010（已更新）
+- [ ] `prds/_registry.md` 中新行 ID 为 F-010，路径为 `prds/F-010-测试功能X/prd.md`
+- [ ] `drafts/F-009-测试功能X/` **不存在**
+- [ ] `drafts/_draft-registry.md` 中 F-009 条目已删除
+
+---
+
+## TC-NP-24 requirement-clarifier 创建的 rdd.md 在新命名格式下仍无冲突（F-009 PRD-GEN-008 衔接）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 `/requirement-clarifier` 创建的 `drafts/[标题]/rdd.md`（旧格式，无 ID 前缀）在执行 `/new-prd` 时被正确重命名，rdd.md 内容不丢失 |
+| **前置条件** | 先执行 `/requirement-clarifier` 使 `drafts/测试功能D/rdd.md` 存在（status: rdd-complete）；`drafts/测试功能D/prd.md` 不存在 |
+
+**测试输入**
+```
+/new-prd feature 测试功能D
+```
+
+**预期行为**
+1. 步骤 2 冲突检测：检查 `drafts/测试功能D/prd.md` → 不存在 → 无冲突
+2. 步骤 3 创建文件：检测到 `drafts/测试功能D/` 目录已存在（含 rdd.md）
+3. 将已有目录重命名为 `drafts/F-[NNN]-测试功能D/`
+4. 在重命名后的目录中创建 prd.md、CHANGELOG.md、archive/
+5. rdd.md 保持完整，status 仍为 rdd-complete
+6. 步骤 5-0 正常读取 rdd.md 并用于填充 PRD
+
+**检查要点**
+- [ ] `drafts/测试功能D/` **不存在**（已重命名为带 ID 前缀格式）
+- [ ] `drafts/F-[NNN]-测试功能D/rdd.md` 存在且内容完整（与重命名前一致）
+- [ ] `drafts/F-[NNN]-测试功能D/prd.md` 正常创建
+- [ ] AI **未**输出冲���阻断提示
+- [ ] prd.md 内容基于 rdd.md 填充（步骤 5-0 正常读取）

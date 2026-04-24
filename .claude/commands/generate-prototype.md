@@ -23,9 +23,9 @@ $ARGUMENTS
 
 **1.5 前置检测：页面规格卡存在性（PROTO-PRE-001）**
 
-按优先级检查 page-spec.md：
-1. `prds/[标题]/page-spec.md`（正式区优先）
-2. `drafts/[标题]/page-spec.md`（草稿区）
+按优先级检查 page-spec.md（路径从步骤 1 的 registry 定位结果推导）：
+1. PRD 所在目录下的 `page-spec.md`（正式区优先）
+2. `drafts/` 对应目录下的 `page-spec.md`（草稿区）
 
 - **存在**：以页面规格卡为主要输入，从中提取页面列表、区块结构、状态定义与操作说明
 - **存在但内容为空**：阻断，提示「页面规格卡内容为空，建议重新运行 `/generate-page-spec [标题]`」

@@ -13,8 +13,8 @@ $ARGUMENTS
 
 | 文档 | 检查路径（正式区优先，草稿区备选） |
 |------|--------------------------------|
-| PRD | `prds/[标题]/prd.md` → `drafts/[标题]/prd.md` |
-| 页面规格卡 | `prds/[标题]/page-spec.md` → `drafts/[标题]/page-spec.md` |
+| PRD | 先查 `prds/_registry.md` 按标题或 ID 匹配路径；未找到时依次搜索 `prds/[ID]-[标题]/prd.md`、`prds/[标题]/prd.md`、`drafts/[ID]-[标题]/prd.md`、`drafts/[标题]/prd.md` |
+| 页面规格卡 | PRD 所在目录下的 `page-spec.md` |
 | 原型 | `outputs/prototypes/[标题]/index.html` |
 
 - **PRD 不存在**：停止执行，提示"未找到「[标题]」的 PRD，请确认标题是否正确"。若检测到相似标题文件夹，提示供 PM 确认。

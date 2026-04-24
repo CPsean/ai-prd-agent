@@ -22,6 +22,8 @@ evals/
     TC-design-solution.md
     TC-write-user-story.md
     TC-design-data-model.md
+    TC-abandon-prd.md
+    TC-prd-migrate.md
   quality-gates/          ← 质检规则测试（验证规则能否正确识别问题）
     QG-pass-cases.md
     QG-fail-cases.md
@@ -62,6 +64,8 @@ evals/
 | `TC-DS-` | /design-solution 命��测试 |
 | `TC-WS-` | /write-user-story 命令测试 |
 | `TC-DM-` | /design-data-model 命令测试 |
+| `TC-AP-` | /abandon-prd 命令测试 |
+| `TC-MIG-` | 存量迁移测试 |
 | `QG-P-` | 质检通过用例 |
 | `QG-F-` | 质检失败用例（预期触发特定质检项） |
 

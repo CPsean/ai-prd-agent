@@ -19,7 +19,7 @@ $ARGUMENTS
 
 按以下优先级查找：
 
-1. `$ARGUMENTS` 包含标题或路径 → 先查 `prds/_registry.md` 匹配；未找到时查 `drafts/[标题]/prd.md`
+1. `$ARGUMENTS` 包含标题或路径 → 先查 `prds/_registry.md` 匹配（路径可能为 `prds/[标题]/prd.md` 或 `prds/[ID]-[标题]/prd.md`）；未找到时在 `drafts/` 中搜索匹配的目录（兼容 `drafts/[标题]/prd.md` 和 `drafts/[ID]-[标题]/prd.md` 两种格式）
 2. 两处都未找到 → 告知用户"未找到该 PRD，请确认标题是否正确"，停止执行
 
 找到后记录 PRD 所在区域（`prds/` 或 `drafts/`），后续步骤据此操作。
@@ -110,7 +110,7 @@ $ARGUMENTS
 >
 > 请回复 A 或 B。
 
-选 B 时：将 `drafts/[标题]/` 整体移动到 `prds/[标题]/`，并在 `_registry.md` 追加注册行。
+选 B 时：执行与 `/new-prd` 步骤 7B 相同的移入正式区流程——ID 冲突检测与自动顺延、将 `drafts/[ID]-[标题]/` 移动到 `prds/[ID]-[标题]/`、删除草稿目录、清理 `drafts/_draft-registry.md` 预注册条目、在 `prds/_registry.md` 追加注册行（路径格式 `prds/[ID]-[标题]/prd.md`）。
 
 ## 注意
 

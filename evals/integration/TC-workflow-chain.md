@@ -592,3 +592,56 @@ Round 4 - PM: 查看现有技能
 - [ ] 输出不包含"Context 一致性"字样
 - [ ] 无报错或警告
 - [ ] 两块报告结构正常输出
+
+---
+
+### TC-INT-20 端到端：requirement-clarifier → new-prd → 移入正式区全链路（含文件夹命名和草稿清理）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **关联模块** | F-009（PRD-GEN-008 + PRD-GEN-009 + PRD-MIG-004） |
+| **测试目标** | 验证从需求澄清到 PRD 正式化的完整链路：rdd.md 创建 → new-prd 重命名目录并预注册 → 移入正式区后 drafts/ 完全清理 |
+| **前置条件** | `prds/_registry.md` 存在，`drafts/` 中无同名目录 |
+
+**测试步骤**
+
+**步骤 1：执行需求澄清**
+```
+/requirement-clarifier 测试端到端功能
+
+需求描述：用户希望在列表页支持按多个条件组合筛选，目前只能单条件筛选。
+```
+- 完成 Phase 1（确认用户故事）和 Phase 2（多轮澄清至收敛）
+- 验证 `drafts/[标题]/rdd.md` 已创建（旧格式，无 ID 前缀）
+
+**步骤 2：执行新建 PRD**
+```
+/new-prd feature [标题]
+```
+（使用步骤 1 确认的标题）
+
+**步骤 2 检查要点**
+- [ ] AI 检测到 `drafts/[标题]/rdd.md` 存在，无冲突阻断
+- [ ] 目录被重命名为 `drafts/[ID]-[标题]/`（含 ID 前缀）
+- [ ] `drafts/[ID]-[标题]/rdd.md` 存在且内容与重命名前一致
+- [ ] `drafts/[ID]-[标题]/prd.md` 正常创建，内容基于 rdd.md 填充
+- [ ] `drafts/_draft-registry.md` 中有对应 ID 条目（状态 in-draft）
+- [ ] AI 读取 rdd.md 用于填充 PRD（步骤 5-0 正常执行）
+
+**步骤 3：确认移入正式区**
+```
+B
+```
+（选择移入正式区）
+
+**步骤 3 检查要点**
+- [ ] `prds/[ID]-[标题]/` 目录存在
+- [ ] `prds/[ID]-[标题]/prd.md` 存在
+- [ ] `prds/[ID]-[标题]/rdd.md` 存在（随目录一并移动）
+- [ ] `prds/[ID]-[标题]/CHANGELOG.md` 存在
+- [ ] `drafts/[ID]-[标题]/` **不存在**（已清理）
+- [ ] `drafts/[标题]/` **不存在**（旧格式目录也不存在）
+- [ ] `drafts/_draft-registry.md` 中无对应 ID 条目（已删除）
+- [ ] `prds/_registry.md` 新行路径为 `prds/[ID]-[标题]/prd.md`（含 ID 前缀）
+- [ ] AI 输出包含"草稿目录已清理"或同义表述
