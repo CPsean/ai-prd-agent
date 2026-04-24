@@ -337,6 +337,7 @@ AI PRD/
 |------|------|
 | `/new-prd [story-card\|feature\|epic] [标题]` | 新建 PRD，自动读取 RDD 草稿（如有），含两轮细节澄清；feature 类型过程中可选新功能或迭代优化模板 |
 | `/update-prd [标题] [变更描述]` | 更新 PRD，自动归档旧版本并写 changelog |
+| `/abandon-prd [标题]` | 放弃草稿，释放预注册 ID，清理 drafts/ 对应目录 |
 | `/prd-summary [标题或ID]` | 输出 PRD 对齐摘要，适合评审前使用 |
 | `/prd-qa [问题]` | 基于 PRD 回答问题（意图识别 → 四层检索 → 来源标注） |
 | `/generate-page-spec [标题]` | 从 PRD 提取页面规格卡（原型生成的前置步骤） |
@@ -364,7 +365,7 @@ AI PRD/
 | 类型 | 命令参数 | 适用场景 | 模板 |
 |------|---------|----------|------|
 | 用户故事卡 | `story-card` | 单场景小需求、子故事 | `templates/story-card.md` |
-| 功能 PRD | `feature` | 一个完整功能模块（新功能）或对已有功能的迭代优化（过程中选模板） | `templates/feature-prd.md` / `templates/iteration-prd.md` |
+| 功能 PRD | `feature` | 一个完整功能模块（新功能）或对已有功能的迭代优化（过程中选模板） | `templates/feature-prd.md` |
 | 史诗 PRD | `epic` | 大型项目，含多个功能 | `templates/epic-prd.md` |
 
 ---
@@ -404,3 +405,6 @@ AI PRD/
 | 2026-04-10 | v4.1 | 新增 `/generate-page-spec`、`/sync-docs` 命令；新增迭代 PRD 模板（`iteration`）；`/new-prd` 支持迭代类型识别；串联流水线打通（RDD → PRD 自动衔接） |
 | 2026-04-15 | v4.2 | PRD 输出质量升级：Feature PRD 重写为 §1-§11 完整结构，含功能清单（§7）和逐功能展开（§8）；新增 `context/business-glossary.md` 和 `context/product-feature-map.md` 联动维护机制 |
 | 2026-04-16 | v5.0 | `/requirement-clarifier` 重构为两阶段流程（Phase 1 用户故事 → Phase 2 RDD），支持中断续接；路由规则升级为客观信号检查，默认走需求澄清路径；CLAUDE.md 瘦身（非运行时内容迁移至 `docs/`） |
+| 2026-04-20 | v5.1 | 路由信号强化：已有功能迭代默认走需求澄清路径；新增领域检查清单扫描 skill；`business-glossary.md` 增加 `type` 分类字段；数据飞轮联动提升为全局行为准则（CLAUDE.md 独立章节 + `rules/data-flywheel.md`） |
+| 2026-04-22 | v5.2 | F-003～F-008 全面落地：新增 `/import-context` 命令；命令路由增强；原型生成加规格卡阻断；文档同步升级为内容级对比；`/prd-qa` 升级为四层检索 + 来源标注；新增技能管理能力；`evals/` 集成测试全面重写（9 场景 19 用例） |
+| 2026-04-23 | v5.3 | PRD 生命周期一致性（F-009）：文件夹命名统一 `[ID]-[标题]/`；草稿预注册 ID 防重号；移入正式区后自动清理 drafts/；新增 `/abandon-prd` 命令；新增存量迁移模板；废弃 `iteration-prd.md` |
