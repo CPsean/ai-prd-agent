@@ -782,3 +782,76 @@ B
 - [ ] §10 AC 条目数 = §6 中 Gherkin AC 条目数（一一对应，无遗漏）
 - [ ] 每条 AC 为一句话可判断通过/不通过的描述（非 Gherkin 全文复制）
 - [ ] §6 未填充时，§10 标注「待 §6 验收标准完善后自动生成」
+
+---
+
+## TC-NP-27 模板 [AI-ONLY] 行不出现在生成的 prd.md（F-012 PRD-GEN-020）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证生成的 prd.md 不包含任何 `[AI-ONLY]` 标记内容，且非 AI-ONLY blockquote 正常保留 |
+| **前置条件** | `templates/feature-prd.md` 已添加 `[AI-ONLY]` 标记（F-012 模板变更已完成） |
+
+**测试输入**
+```
+/new-prd feature 消息推送设置
+```
+
+**预期行为**
+1. AI 读取 `templates/feature-prd.md`，识别含 `[AI-ONLY]` 的 blockquote 行
+2. 生成 `prd.md` 时跳过所有 `[AI-ONLY]` 行及其多行续行块
+3. 非 `[AI-ONLY]` 的 blockquote（如 `> 详细变更历史见同目录 CHANGELOG.md`）正常保留
+4. 剥离后无连续多余空行（最多 1 个空行）
+
+**检查要点**
+- [ ] 生成的 `prd.md` 中不包含 `[AI-ONLY]` 字样
+- [ ] 不包含 `> **编写规则**`、`> **使用场景**`、`> **复制方法**` 等模板指引
+- [ ] `> 详细变更历史见同目录 CHANGELOG.md` **保留**（正常 blockquote）
+- [ ] 正文中无连续超过 1 行的空行
+
+---
+
+## TC-NP-28 YAML frontmatter 行内注释被剥离（F-012 PRD-GEN-021）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证生成的 prd.md YAML frontmatter 不包含行内注释，空值字段保留字段名和冒号 |
+| **前置条件** | 模板 YAML 包含行内注释（如 `epic: # 所属史诗 PRD 的 ID`） |
+
+**测试输入**
+```
+/new-prd feature 消息推送设置
+```
+
+**预期行为**
+1. 生成的 `prd.md` YAML frontmatter 中，`epic:` 保留，但 `# 所属史诗 PRD 的 ID，如 E-001` 被删除
+2. 所有 `field: value  # 注释` 格式的行，保留 `field: value`，删除 `# 注释`
+3. 行尾无多余空格
+
+**检查要点**
+- [ ] YAML `epic:` 字段存在，行尾无 `#` 注释
+- [ ] YAML `related-stories:` 字段存在，行尾无 `#` 注释
+- [ ] YAML `prototype-path:` 字段存在，行尾无 `#` 注释
+- [ ] YAML 正文内容正确（字段值未被误删）
+
+---
+
+## TC-NP-29 非 AI-ONLY blockquote 保留（F-012 PRD-GEN-020 负向）
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证正常 blockquote 不被误删，确认 AI-ONLY 剥离不过度 |
+| **前置条件** | 同 TC-NP-27 |
+
+**测试输入**
+```
+/new-prd feature 消息推送设置
+```
+
+**检查要点**（以下 blockquote 必须在生成的 prd.md 中存在）
+- [ ] `> 详细变更历史见同目录 CHANGELOG.md`（§变更记录章节）
+- [ ] 用户故事章节中 Gherkin 格式的非 blockquote 内容完整
+- [ ] story-card 类型中 `> **As a**` 用户故事 blockquote **保留**（为内容占位，非 AI-ONLY）

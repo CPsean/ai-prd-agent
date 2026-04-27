@@ -1,7 +1,6 @@
-# 用户故事卡模板（Story Card）
-
-> **使用场景**：单一场景的小需求，或大型 Feature PRD 的子故事拆解。
-> **复制方法**：运行 `/new-prd story-card [标题]`，AI 自动从此模板创建。
+> **[AI-ONLY]** 用户故事卡模板（Story Card）
+> **[AI-ONLY]** **使用场景**：单一场景的小需求，或大型 Feature PRD 的子故事拆解。
+> **[AI-ONLY]** **复制方法**：运行 `/new-prd story-card [标题]`，AI 自动从此模板创建。
 
 ---
 
