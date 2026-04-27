@@ -60,6 +60,9 @@ prds/                         ← 第二步：确认后移入，注册生效
     archive/
       prd-v1.0.md             ← 历史快照（禁止修改）
   archive/                    ← 整体归档（需求废弃或完工）
+
+backlog/                        ← 需求池（RDD 前置阶段的需求收口区）
+  requirement-pool.md           ← 需求池主文件（由 /backlog 首次运行时创建）
 ```
 
 ### AI 读取规则

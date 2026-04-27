@@ -4,10 +4,10 @@
 
 | 元数据 | 值 |
 |--------|-----|
-| 基于 template 版本 | v5.4（2026-04-27） |
-| 基于 template 提交 | `82aa66f` |
+| 基于 template 版本 | v5.5（2026-04-27） |
+| 基于 template 提交 | `8e0736f` |
 | 同步日期 | 2026-04-27 |
-| 同步内容摘要 | F-011 需求池管理（/backlog 命令、飞轮集成）+ F-010 质量门禁前置 |
+| 同步内容摘要 | F-012 PRD 输出净化（[AI-ONLY] 标记体系、PRD-GEN-020/021、PRD-UPD-010、G11 质量门禁） |
 
 ---
 
@@ -226,9 +226,10 @@ has-prototype: false
 |------|----------|
 | `examples/good-prd/` | 生成或审查 PRD 内容时 |
 | `examples/anti-patterns/prd-anti-patterns.md` | 执行质检时 |
-| `rules/prd-quality-gates.md` | 执行摘要或更新 PRD 时，输出末尾自动质检 |
+| `rules/prd-quality-gates.md` | 执行摘要或更新 PRD 时，输出末尾自动质检；G11 检查 prd.md 是否包含模板残留（[AI-ONLY] 标记、> **编写规则**:、YAML 行内注释） |
 | `rules/business-rules.md` | 撰写或审查业务规则章节时 |
 | `rules/terminology.md` | 生成任何 PRD 内容时，术语以此为准 |
+| `templates/feature-prd.md`（含 [AI-ONLY] 标记） | 生成 prd.md 时执行净化：剥离所有 `[AI-ONLY]` 行及其连续块（PRD-GEN-020），剥离 YAML 行内注释（PRD-GEN-021） |
 
 ---
 
@@ -252,6 +253,16 @@ has-prototype: false
 
 需求池管理 → "记一下：[需求]"/"看一下需求池"/"扫描PRD待办"/"拿新需求去排个期"
 ```
+
+### PRD 净化规则（F-012）
+
+**生成时（/new-prd 步骤 3a）**：写入 prd.md 前自动执行两步净化：
+1. **PRD-GEN-020**：跳过所有含 `[AI-ONLY]` 的 blockquote 行；若首行含 `[AI-ONLY]`，跳过整个连续块；保留非 `[AI-ONLY]` 正常 blockquote
+2. **PRD-GEN-021**：仅在 YAML frontmatter（`---` 块内）删除 ` # 注释` 后缀，保留字段名和值
+
+**存量清理（/update-prd 步骤 3.5 PRD-UPD-010）**：更新已有 PRD 后，扫描全文残留的已知模板指引（`> **编写规则**:`、`> 端清单参考:`、`> **[AI-ONLY]**` 等），自动删除并在输出中报告「已清理 N 处」。
+
+**质量门禁（G11）**：prd.md 中存在 `[AI-ONLY]`、`> **编写规则**:` 或 YAML 行内注释时，G11-01/02/03 全部 ❌ 阻断 PRD 移入正式区。
 
 ### 版本管理规则
 
