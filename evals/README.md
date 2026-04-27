@@ -24,6 +24,7 @@ evals/
     TC-design-data-model.md
     TC-abandon-prd.md
     TC-prd-migrate.md
+    TC-backlog.md
   quality-gates/          ← 质检规则测试（验证规则能否正确识别问题）
     QG-pass-cases.md
     QG-fail-cases.md
@@ -33,21 +34,10 @@ evals/
 
 ## 执行方式
 
-### Claude Code
-
 1. 打开一个**新的 Claude Code 对话**（避免上下文污染）
 2. 复制测试用例的"测试输入"部分，粘贴到对话框执行
 3. 对照"检查要点"逐条判断输出是否符合预期
-4. 在用例的**状态列**记录结果
-
-### OpenAI Codex
-
-1. 在 Codex 环境中打开项目
-2. 使用 TC 文件中 `Codex 等效输入` 标注的自然语言触发
-3. 对照"检查要点"逐条判断输出是否符合预期
-4. 在用例的 **Codex 状态** 行记录结果
-
-### 状态符号
+4. 在用例的**状态列**记录结果：
 
 | 符号 | 含义 |
 |------|------|
@@ -76,9 +66,7 @@ evals/
 | `TC-WS-` | /write-user-story 命令测试 |
 | `TC-DM-` | /design-data-model 命令测试 |
 | `TC-AP-` | /abandon-prd 命令测试 |
-| `TC-CTX-` | /import-context 命令测试 |
-| `TC-CMD-` | 命令路由测试 |
-| `TC-SM-` | 技能管理测试 |
+| `TC-BKL-` | /backlog 命令测试 |
 | `TC-MIG-` | 存量迁移测试 |
 | `QG-P-` | 质检通过用例 |
 | `QG-F-` | 质检失败用例（预期触发特定质检项） |
