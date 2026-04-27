@@ -28,6 +28,9 @@ context/ ──────读入──────▶ PRD 输出质量提升
 | `/update-prd` PRD 变更（Step 8） | `product-feature-map.md` | 新增功能节点时提议更新 | 本次变更仅修改已有功能的描述，无新节点 |
 | `/update-prd` PRD 变更（Step 8） | `business-glossary.md` | 新增术语时提议追加 | 本次变更未引入新专有名词 |
 | `/ingest-prd` 历史 PRD 录入（Step 9） | 两个文件 | 同步检查并提议缺失的术语和功能节点 | 已有完整 context 覆盖 |
+| `/new-prd` PRD 移入正式区（Step 7 选 B 完成后） | `backlog/requirement-pool.md` | 扫描 §12 + 正文 TODO → 提议入池（BKL-FLY-001） | PRD 中无 TODO/OQ，或需求池不存在 |
+| `/update-prd` PRD 变更完成后 | `backlog/requirement-pool.md` | 扫描新增 TODO/OQ → 提议入池（BKL-FLY-002） | 本次变更无新增 TODO/OQ，或需求池不存在 |
+| `/requirement-clarifier` RDD 完成 / `/new-prd` 状态变化 | `backlog/requirement-pool.md` | 检查需求池中是否有关联条目 → 提议更新状态（BKL-FLY-003） | 需求池不存在或无匹配条目 |
 
 ### 触发规则：什么算"新术语"
 
