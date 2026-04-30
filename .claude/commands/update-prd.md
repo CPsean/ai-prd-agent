@@ -109,15 +109,24 @@ $ARGUMENTS
 
 **8. context 文件同步检查（仅正式区 PRD，且类型为 feature 或 epic 时执行）**
 
-读取本次变更内容，判断是否引入了新的功能节点或业务术语：
+读取本次变更中 **§5 功能结构**和 **§7 功能清单**的内容（排除 §12 开放问题和 TODO/待规划项），判断是否引入了新的功能模块或业务术语：
 
-- **新增功能节点**（如本次变更新增了页面、模块或功能入口）→ 提议更新 `context/product-feature-map.md`：
+- **新增 L2 功能模块**（如本次变更新增了页面、模块或功能入口，且出现在 §5 或 §7 中）→ 提议更新 `context/product-feature-map.md` Mermaid 树和索引表：
 
-  > 本次变更新增了以下功能节点，建议追加到 `context/product-feature-map.md`：
-  > [节点列表]
+  > 本次变更新增了以下功能模块，建议追加到 `context/product-feature-map.md`：
+  > - Mermaid 树：[L1 能力域] 下追加 [模块名]
+  > - 前缀映射表：[模块名] → [英文前缀]
+  > - 索引表：[关键词列表]
   > 回复「确认」写入，或告知需要修改。
 
-  用户确认后更新 product-feature-map.md（含前缀映射表和 Mermaid 功能树）。
+- **已有 L2 模块下新增子功能**（本次变更在 §7 中新增了功能点，但所属模块已存在）→ 仅更新索引表：
+
+  > 本次变更在 [L2 模块名] 下新增了子功能，建议更新 `context/product-feature-map.md` 索引表：
+  > - 追加关键词：[关键词列表]
+  > - 关联 PRD 追加：[当前 PRD ID]
+  > 回复「确认」写入，或告知需要修改。
+
+  用户确认后更新 product-feature-map.md 对应区域。
 
 - **新增业务术语**（如本次变更引入了 `context/business-glossary.md` 中尚未定义的专有名词）→ 提议追加：
 

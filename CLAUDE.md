@@ -130,11 +130,13 @@
 ├─ 还没有任何需求，在做客户研究
 │   └─ → skill: jobs-to-be-done
 │       （理解客户的 Functional/Social/Emotional Jobs、Pains、Gains）
+│       适用：目标用户不明确、产品定位待验证、不知道用户痛点是什么
 │
 ├─ 有一个功能想法/需求（无论描述是否清晰）
 │   └─ → /requirement-clarifier         （默认路径）
-│       （JTBD 快速诊断 X-Y 问题，输出 RDD 卡片）
+│       （X-Y 问题诊断，输出 RDD 卡片）
 │       ⚠️ 输出的用户故事是草稿，不是开发规格
+│       ℹ️ 若澄清中发现涉及商业/定位层问题，会建议先转 JTBD
 │       ℹ️ 仅当用户明确说"方案已定，直接写PRD"且无 X-Y 风险信号时才走 /new-prd
 │
 ├─ 需求已澄清，要写开发可交付的用户故事
@@ -154,7 +156,7 @@
 
 | 容易混淆的组合 | 区分方式 |
 |--------------|---------|
-| `jobs-to-be-done` vs `/requirement-clarifier` | 有无具体需求待评估：无 → JTBD；有 → clarifier |
+| `jobs-to-be-done` vs `/requirement-clarifier` | 客户研究（用户是谁、痛点是什么）→ JTBD；需求定义（功能做什么、怎么做）→ clarifier。clarifier 中发现商业/定位层问题时会建议转 JTBD |
 | `/requirement-clarifier` vs `/write-user-story` | 草稿确认问题 → clarifier；正式交付开发 → write-user-story |
 
 ---

@@ -344,7 +344,7 @@ Mini example excerpt:
 ## References
 
 ### Related Skills
-- `skills/requirement-clarifier.md` — JTBD 分析后，用此 skill 评估具体需求是否解决了正确的问题
+- `/requirement-clarifier` 命令 — JTBD 分析完成后，进入此命令做具体功能的问题诊断和 RDD 生成。两者关系：JTBD 解决"给谁做、为什么做"（客户研究层），clarifier 解决"做什么、怎么验收"（需求定义层）。clarifier 中发现商业/定位层问题时也会建议转回 JTBD
 
 ### External Frameworks
 - Clayton Christensen, *Competing Against Luck* (2016) — Origin of Jobs-to-be-Done theory
