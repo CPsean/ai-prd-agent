@@ -186,6 +186,21 @@
 | `examples/anti-patterns/prd-anti-patterns.md` | 执行质检时，识别模糊表达和不完整结构的根因 |
 | `examples/skill-outputs/` | 执行对应 skill 时，对齐输出格式和信息密度 |
 
+### evals/ 说明（不由 AI 自动读取）
+
+> 测试基础设施，仅供人工维护和运行，AI 在执行 PRD 命令时不读取此目录。
+
+| 子目录/文件 | 用途 |
+|------------|------|
+| `evals/commands/TC-*.md` | 各斜杠命令的手工测试用例（输入 + 预期行为 + 检查要点） |
+| `evals/integration/TC-workflow-chain.md` | 跨命令端到端集成测试用例 |
+| `evals/quality-gates/` | 质检规则通过/失败用例 |
+| `evals/scripts/test_unit.py` | 单元测试：命令文件结构 + 规则文件完整性（`pytest`，无需 API） |
+| `evals/scripts/eval_runner.py` | 集成测试自动化 Runner（调用 Anthropic API 验证 AI 行为） |
+| `evals/scripts/requirements.txt` | 自动化脚本依赖：`anthropic`、`pyyaml` |
+
+**命令改动后维护规则**：修改任何 `.claude/commands/*.md` 后，须同步更新对应 `evals/commands/TC-*.md` 的预期行为，并重新运行 `pytest evals/scripts/test_unit.py`。
+
 ### rules/ AI 读取规则
 
 | 文件 | 何时读取 |
