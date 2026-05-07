@@ -2,8 +2,6 @@
 
 > 关联命令：`.claude/commands/new-prd.md`
 > 前置条件：`prds/_registry.md` 存在且已初始化
-> Codex 等效输入：「新建功能PRD：[标题]」或「帮我起草[标题]的功能需求文档」
-> Codex 状态：已适配
 
 ---
 

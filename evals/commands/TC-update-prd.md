@@ -3,8 +3,6 @@
 > 关联命令：`.claude/commands/update-prd.md`
 > 参数格式：`/update-prd [标题] [变更描述]`
 > 前置条件：目标 PRD 存在于 `prds/` 或 `drafts/` 中
-> Codex 等效输入：「更新[标题]的 PRD：[变更描述]」
-> Codex 状态：已适配
 
 ---
 
