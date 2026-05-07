@@ -4,10 +4,10 @@
 
 | 元数据 | 值 |
 |--------|-----|
-| 基于 template 版本 | v5.6（2026-05-07） |
-| 基于 template 提交 | `d074663` |
+| 基于 template 版本 | v5.7（2026-05-07） |
+| 基于 template 提交 | `f3aa4f7` |
 | 同步日期 | 2026-05-07 |
-| 同步内容摘要 | prd-qa 问答增强（F-013）：自然语言触发/问题清晰度收敛/多意图顺序处理/强制来源标注/启发式追问引导；改进意图 > 查询意图路由规则（BR-01） |
+| 同步内容摘要 | OpenAPI 文档集成（F-014）：新增 /import-openapi、/update-openapi、/export-openapi；OAPI-FLY-001 飞轮规则；sync-docs SYNC-OAPI-001 接口一致性检查；feature-prd §8.10 模板节 |
 
 ---
 
@@ -61,6 +61,9 @@
 | 导入上下文 / 导入截图 / 录入背景 / 帮我录入 | `.claude/commands/import-context.md` |
 | 放弃草稿 / 取消需求 / 不做了 / 清理草稿 | `.claude/commands/abandon-prd.md` |
 | 记一下 / 有个需求 / 需求池 / 看待办 / 扫描PRD / 排个期 / 初始化需求池 | `.claude/commands/backlog.md` |
+| 导入API规范 / 建立OpenAPI / 新建接口规范 / import-openapi | `.claude/commands/import-openapi.md` |
+| 同步接口变更 / 更新OpenAPI / update-openapi | `.claude/commands/update-openapi.md` |
+| 导出API文档 / 对外发布接口 / export-openapi | `.claude/commands/export-openapi.md` |
 | 需求分析报告 / 深度分析 | `.claude/commands/analyze-requirement.md` |
 | 方案设计 / 架构设计 | `.claude/commands/design-solution.md` |
 | 数据模型 / 数据库设计 / 表结构 | `.claude/commands/design-data-model.md` |
@@ -101,11 +104,12 @@
 - 续接："继续刚才的报销单批量导出需求分析" → 检测 rdd.md 状态后续接
 - 商业层升级："不确定这功能目标用户是谁" → Phase 1 检测到商业层信号 → 建议先做 JTBD
 
-### sync-docs：包含 Context 一致性检查
+### sync-docs：包含 Context 一致性检查 + OpenAPI 接口同步检查
 
 `sync-docs` 除检查 PRD / 页面规格 / 原型版本一致性外，还会额外检查：
 - **术语孤岛**：PRD §4 中有但 `context/business-glossary.md` 未登记的术语
 - **功能前缀**：PRD §7 中有但 `context/product-feature-map.md` 未注册的功能前缀
+- **OpenAPI 接口同步（SYNC-OAPI-001）**：PRD §8.10 有实质内容时，检查 `context/api-registry.md` 中关联 API 的 yaml changelog 版本是否落后于 PRD 当前版本；结果分三类：✅ 已同步 / ⚠️ 规范落后（确认差异 + 提议运行 /update-openapi）/ 规范文件缺失（提议运行 /import-openapi）
 
 若 context 文件不存在，自动跳过该检查项，不报错。
 
@@ -269,6 +273,11 @@ has-prototype: false
 
 涉及页面变更 → "生成页面规格：[标题]" → "生成原型：[标题]"
 
+涉及接口变更
+  → "导入API规范：[api-name]"           （首次建立规范或导入新版本）
+  → "同步接口变更：[api-name]"           （PRD 更新后同步规范，飞轮自动触发提议）
+  → "导出API文档：[api-name] [version]"  （需对外发布时，经确认后写入 outputs/openapi/）
+
 评审 & 迭代 → "给我[标题]的评审摘要" → "更新[标题]的PRD" → "检查文档一致性：[标题]"
 
 需求池管理 → "记一下：[需求]"/"看一下需求池"/"扫描PRD待办"/"拿新需求去排个期"
@@ -342,6 +351,7 @@ has-prototype: false
 | 更新 PRD 含新术语/新功能 | 提议同步对应 context 文件 |
 | 更新 PRD 完成后 | 扫描新增 TODO/OQ → 提议入需求池（BKL-FLY-002） |
 | 需求澄清 RDD 完成 / PRD 状态变化 | 提议更新需求池关联条目状态（BKL-FLY-003） |
+| 更新 PRD 完成，§8.10 有实质内容，PRD 在正式区 | 提议运行 /update-openapi 同步接口变更（OAPI-FLY-001） |
 
 **读入方向（Context → PRD）——写对应章节时按需读取**：
 
@@ -364,6 +374,7 @@ has-prototype: false
 | 提及产品已有功能模块名称 | `context/product-feature-map.md` |
 | 出现产品专有名词（非通用词）| `context/business-glossary.md` |
 | "优先级"/"策略"/"边界约束"/"这期不做" | `context/product-strategy.md` |
+| "API"/"接口"/"endpoint"/"调用方"/"OpenAPI"/"Swagger" | `context/api-registry.md`（渐进加载，最多读取 2 个关联规范文件） |
 
 读取后直接引用内容，不说「我读取了文件」；同一文件同一对话只读一次。
 

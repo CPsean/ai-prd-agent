@@ -413,3 +413,89 @@
 **检查要点**
 - [ ] 输出不包含"Context 一致性"字样
 - [ ] 无报错或警告
+
+---
+
+## TC-SD-17 OpenAPI 接口同步：yaml changelog 落后于 PRD → 报确定差异
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **功能编号** | SYNC-OAPI-001 |
+| **测试目标** | 验证 PRD §8.10 有内容且 yaml changelog 未包含最新版本时，报"确定差异" |
+| **前置条件** | PRD `F-014` 当前版本 V1.1，§8.10 有实质内容；`context/api-registry.md` 存在，含关联 `order-api`；`openapi/order-api.yaml` 存在，头部 changelog 最新记录为"F-014 \| V1.0" |
+
+**测试输入**
+```
+/sync-docs F-014-OpenAPI文档集成
+```
+
+**预期行为**
+1. AI 读取 PRD §8.10，识别有实质内容
+2. 读取 `context/api-registry.md`，找到关联 API `order-api`
+3. 读取 `openapi/order-api.yaml` 头部 changelog，最新记录为 V1.0
+4. PRD 当前 V1.1，changelog 未包含 V1.1 → 判断落后
+5. 在块一"OpenAPI 接口同步"小节输出：
+   - `order-api`：⚠️ 规范落后（PRD 当前 V1.1，changelog 最新记录 V1.0）（确定差异）
+6. 建议运行 `/update-openapi order-api`
+
+**检查要点**
+- [ ] 块一包含"OpenAPI 接口同步"小节
+- [ ] 标注为"确定差异"
+- [ ] 提示包含具体版本号对比（V1.1 vs V1.0）
+- [ ] 建议操作为 `/update-openapi order-api`
+
+---
+
+## TC-SD-18 OpenAPI 接口同步：yaml 文件不存在 → 报规范缺失
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **功能编号** | SYNC-OAPI-001 |
+| **测试目标** | 验证 PRD §8.10 有内容但对应 yaml 文件不存在时，报"规范文件缺失" |
+| **前置条件** | PRD §8.10 有实质内容（新增接口描述）；`context/api-registry.md` 存在，含关联 `payment-api`；`openapi/payment-api.yaml` **不存在** |
+
+**测试输入**
+```
+/sync-docs [含 §8.10 内容的 PRD 标题]
+```
+
+**预期行为**
+1. 读取 §8.10，有内容
+2. api-registry.md 中找到关联 `payment-api`
+3. 检查 `openapi/payment-api.yaml`，不存在
+4. 输出：`payment-api`：⚠️ 规范文件 `openapi/payment-api.yaml` 缺失（确定差异）
+5. 建议运行 `/import-openapi payment-api`
+
+**检查要点**
+- [ ] 识别出规范文件缺失（确定差异）
+- [ ] 建议操作为 `/import-openapi payment-api`
+- [ ] 内部版 yaml 文件不被误创建
+
+---
+
+## TC-SD-19 OpenAPI 接口同步：§8.10 填「不涉及」→ 静默跳过
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **功能编号** | SYNC-OAPI-001 |
+| **测试目标** | 验证 §8.10 填「不涉及」时不触发 OpenAPI 同步检查 |
+| **前置条件** | PRD §8.10 填"不涉及"；`context/api-registry.md` 存在 |
+
+**测试输入**
+```
+/sync-docs [§8.10 填「不涉及」的 PRD 标题]
+```
+
+**预期行为**
+- AI 读取 §8.10，判定为「不涉及」
+- 不执行 OpenAPI 同步检查
+- 输出中**不包含** "OpenAPI 接口同步" 小节
+- 其余报告正常输出
+
+**检查要点**
+- [ ] 输出不包含"OpenAPI 接口同步"字样
+- [ ] 无报错
+- [ ] 块一、块二结构正常输出

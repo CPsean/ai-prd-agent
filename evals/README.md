@@ -75,6 +75,7 @@ python evals/scripts/eval_runner.py -v              # 运行全部，显示详�
 | `TC-DM-` | /design-data-model 命令测试 |
 | `TC-AP-` | /abandon-prd 命令测试 |
 | `TC-BKL-` | /backlog 命令测试 |
+| `TC-OA-` | /import-openapi /update-openapi /export-openapi 命令测试 |
 | `TC-MIG-` | 存量迁移测试 |
 | `QG-P-` | 质检通过用例 |
 | `QG-F-` | 质检失败用例（预期触发特定质检项） |

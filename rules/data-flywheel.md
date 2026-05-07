@@ -31,6 +31,7 @@ context/ ──────读入──────▶ PRD 输出质量提升
 | `/new-prd` PRD 移入正式区（Step 7 选 B 完成后） | `backlog/requirement-pool.md` | 扫描 §12 + 正文 TODO → 提议入池（BKL-FLY-001） | PRD 中无 TODO/OQ，或需求池不存在 |
 | `/update-prd` PRD 变更完成后 | `backlog/requirement-pool.md` | 扫描新增 TODO/OQ → 提议入池（BKL-FLY-002） | 本次变更无新增 TODO/OQ，或需求池不存在 |
 | `/requirement-clarifier` RDD 完成 / `/new-prd` 状态变化 | `backlog/requirement-pool.md` | 检查需求池中是否有关联条目 → 提议更新状态（BKL-FLY-003） | 需求池不存在或无匹配条目 |
+| `/update-prd` 变更完成，且 §8.10 有实质内容（非「不涉及」、非空），且 PRD 在正式区 | `openapi/` 目录 | 检查 `context/api-registry.md` 是否有关联 API：有则输出同步提议（含变更摘要），提示运行 `/update-openapi`；无则提议先运行 `/import-openapi` 初始化规范（OAPI-FLY-001） | PRD 在草稿区；或 §8.10 填「不涉及」或为空 |
 
 ### 触发规则：什么算"新术语"
 

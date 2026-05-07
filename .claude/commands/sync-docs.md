@@ -54,6 +54,37 @@ $ARGUMENTS
 
 Context 文件均不存在时静默跳过，不输出此小节。
 
+**2.6 OpenAPI 接口同步检查**（SYNC-OAPI-001）（PRD §8.10 有实质内容时执行）
+
+1. 读取 PRD 所有 §8.x.10 或 §8.10 章节内容：
+   - 内容为「不涉及」或为空 → 静默跳过，不输出此小节
+   - 有实质内容 → 继续
+
+2. 查找关联 OpenAPI 规范：
+   - 读取 `context/api-registry.md`（不存在时 → 输出"api-registry.md 不存在，无法确认关联规范"，建议运行 `/import-openapi`，计为确定差异）
+   - 按"关联 PRD"字段匹配当前 PRD ID，找到所有关联 API 条目
+
+3. 对每个关联 API，检查同步状态：
+
+   **yaml 文件不存在**：
+   - 报"规范文件 `openapi/[api-name].yaml` 缺失"（确定差异）
+   - 建议运行 `/import-openapi [api-name]`
+
+   **yaml 文件存在**：
+   - 读取头部 changelog 块（`# 日期 | PRD-ID | PRD版本 | 变更摘要` 格式的注释行）
+   - 对照 PRD 当前版本号，判断最新变更是否已同步：
+     - changelog 已包含当前 PRD ID 的最新版本 → ✅ 已同步
+     - changelog 未包含当前 PRD 最新版本 → 报"接口规范落后于 PRD"（确定差异），建议运行 `/update-openapi [api-name]`
+
+4. 将结论纳入块一"文档一致性"的 **OpenAPI 接口同步** 小节输出：
+   ```
+   **OpenAPI 接口同步：**
+   - order-api：✅ 已同步（changelog 含 F-014 V1.1）
+   - payment-api：⚠️ 规范落后（PRD 当前 V1.2，changelog 最新记录 V1.0）（确定差异）
+   ```
+   全部已同步时：`✅ OpenAPI 接口同步：已全部同步`
+   §8.10 均不涉及时：静默跳过，不输出此小节
+
 **3. 飞轮待处理检测（SYNC-FLY-001）**
 
 检查 `context/pending-flywheel.md`：
@@ -83,6 +114,10 @@ Context 文件均不存在时静默跳过，不输出此小节。
 - 术语孤岛：[列表]
 - 功能前缀未注册：[列表]
 > 均无问题时：✅ Context 一致性：无孤岛
+
+**OpenAPI 接口同步：**（仅 PRD §8.10 有内容时输出）
+- [api-name]：✅ 已同步 / ⚠️ 规范落后（确定差异）
+> 均同步时：✅ OpenAPI 接口同步：已全部同步
 
 ### 块二：飞轮待处理项
 
