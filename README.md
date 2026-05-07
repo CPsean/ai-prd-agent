@@ -345,6 +345,9 @@ AI PRD/
 | `/sync-docs [标题]` | 核查 PRD、页面规格卡、原型的一致性；检测飞轮待处理项 |
 | `/import-context [内容]` | 导入产品背景/术语/截图等上下文，AI 分类建议后确认写入 |
 | `/backlog [自然语言描述]` | 需求池管理：录入/查看/排序/扫描/排期，自然语言意图路由 |
+| `/import-openapi [api-name]` | 新建或差异比对更新 OpenAPI 规范（含目录初始化），正式区 PRD 才可执行 |
+| `/update-openapi [api-name]` | 增量同步 PRD §8.10 接口变更到规范文件，changelog 自动去重 |
+| `/export-openapi [api-name] [version?]` | 两阶段过滤（接口级+参数级）+ 敏感扫描，生成对外精简版 |
 | `/ingest-prd` | 录入历史 PRD，自动重建结构、更新注册表和需求清单 |
 
 ### 需求分析
@@ -387,6 +390,11 @@ AI PRD/
   → /generate-page-spec [标题]             # PRD → 页面规格卡
   → /generate-prototype [标题]             # 页面规格卡 → 可交互原型
 
+涉及接口变更
+  → /import-openapi [api-name]            # 首次建立规范或导入新版本
+  → /update-openapi [api-name]            # PRD 更新后同步规范（飞轮自动提议）
+  → /export-openapi [api-name] [version]  # 对外发布时两阶段过滤+敏感扫描
+
 评审 & 迭代
   → /prd-summary [标题]                    # 评审前对齐
   → /update-prd [标题] [变更描述]          # 评审后更新（自动存档）
@@ -412,3 +420,4 @@ AI PRD/
 | 2026-04-27 | v5.4 | 需求池管理（F-011）+ 质量门禁前置（F-010）：新增 `/backlog` 命令（自然语言意图路由，覆盖录入/查看/排序/扫描/排期/归档）；飞轮扩展（PRD 移入正式区/更新后自动扫描 TODO/OQ 提议入池）；`/new-prd` 移入正式区前新增质量门禁检查（❌ 项阻断） |
 | 2026-04-27 | v5.5 | PRD 输出净化（F-012）：模板三件套新增 `[AI-ONLY]` 标记（共 20 处），`/new-prd` 写入前自动剥离（PRD-GEN-020/021），`/update-prd` 新增存量模板残留扫描清理（PRD-UPD-010），新增 G11 质量门禁（模板净化），新增通用研发流程 Playbook（`playbooks/feature-dev-playbook.md`） |
 | 2026-05-07 | v5.6 | prd-qa 问答增强（F-013）：自然语言触发词等待具体问题后再检索（KQA-RTG-001）；无锚点问题最多追问 3 轮（KQA-QRY-004）；多意图顺序回答单次最多 3 个（KQA-QRY-005）；有命中强制输出来源标注（KQA-ANS-002）；答案末尾追加 2-3 条完整问句追问建议（KQA-GDE-001）；改进意图 > 查询意图全局路由规则（BR-01） |
+| 2026-05-07 | v5.7 | OpenAPI 文档集成（F-014）：新增 `/import-openapi`（正式区门控 + 目录初始化 + 两路径：新建/差异比对）、`/update-openapi`（changelog 去重 + 增量 diff + 废弃接口提示）、`/export-openapi`（两阶段过滤：接口级+参数级 + 敏感内容扫描 + 版本快照）；`feature-prd.md` 模板新增 §8.10 接口变更说明节；OAPI-FLY-001 飞轮：`/update-prd` 完成后自动扫描 §8.10 提议同步；`/sync-docs` 新增 OpenAPI 接口同步检查（SYNC-OAPI-001） |

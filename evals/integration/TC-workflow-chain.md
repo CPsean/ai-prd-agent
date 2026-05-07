@@ -807,3 +807,74 @@ Round 3 - 用户: 是 F-007 知识库提问这个功能的
 - [ ] 回答末尾包含「**你可能还想问：**」追问建议块
 - [ ] 追问建议为完整可读句，不少于 2 条
 - [ ] 追问建议范围限定在 F-007 同一 PRD 内（不跨 PRD）
+
+---
+
+## 场景十二：OpenAPI 文档集成飞轮链路
+
+> 链路：PRD §8.10 填写 → `/update-prd` → 飞轮提议 `/update-openapi` → 执行同步 → `/export-openapi` 带版本号 → 生成快照 + 更新 latest
+
+### TC-WF-OA-01 PRD §8.10 变更 → 飞轮提议 → 同步 → 导出带版本号快照
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **关联模块** | F-014（OAPI-FLY-001, OAPI-UPD-001, OAPI-EXP-001） |
+| **测试目标** | 验证从 PRD 接口变更到 OpenAPI 规范同步再到对外版本导出的完整链路 |
+| **前置条件** | `prds/F-014-OpenAPI文档集成/prd.md` 在正式区；`openapi/order-api.yaml` 存在（含 changelog 头部，F-014 V1.0 已同步）；`context/api-registry.md` 存在，含"订单管理"模块下的 order-api；`_hidden-interfaces.md` 含 1 条接口级隐藏 |
+
+**测试步骤**（按序执行，后续步骤依赖前置输出）
+
+**步骤 1：update-prd 触发飞轮**
+```
+/update-prd F-014-OpenAPI文档集成 §8.10 补充新增 /v1/orders/summary（GET）接口的响应字段说明
+```
+
+**步骤 1 预期行为**
+1. update-prd 正常完成（归档 V1.0 → 更新内容 → 版本升至 V1.1）
+2. 飞轮 OAPI-FLY-001 触发：扫描 §8.10，检测到有实质内容
+3. 检查 api-registry.md，找到关联 API（order-api）
+4. 输出同步提议，含变更摘要（接口路径 + 变更类型）
+5. 提示运行 `/update-openapi order-api`，可回复"跳过"
+
+**步骤 1 检查要点**
+- [ ] update-prd 主流程正常完成（版本号递增、changelog 写入）
+- [ ] 输出末尾有 OpenAPI 同步提议，含具体接口路径
+- [ ] 提议为非阻断（提供"跳过"选项）
+- [ ] PRD 在草稿区时不触发此提议（已由 TC-OA-05 覆盖，此处验证正式区触发）
+
+**步骤 2：执行 update-openapi 增量同步**
+```
+/update-openapi order-api
+```
+
+**步骤 2 预期行为**
+1. 读取 yaml 头部 changelog，确认 F-014 V1.0 已同步
+2. 读取 PRD §8.10，筛选 V1.1 的未同步条目（新增 /v1/orders/summary）
+3. 生成增量 diff 摘要，展示等待确认
+4. 确认后执行增量修改，追加 V1.1 changelog 条目
+
+**步骤 2 检查要点**
+- [ ] diff 摘要仅包含 V1.1 未同步变更（不重复显示 V1.0 内容）
+- [ ] changelog 条目正确追加（格式：`# 日期 | F-014 | V1.1 | 变更摘要`）
+- [ ] yaml 文件已更新，包含新增 endpoint
+
+**步骤 3：export-openapi 带版本号导出**
+```
+/export-openapi order-api 1.1.0
+```
+
+**步骤 3 预期行为**
+1. 读取内部完整版 yaml + `_hidden-interfaces.md`（1 条接口级隐藏）
+2. 第一阶段：移除接口级隐藏 endpoint
+3. 第二阶段：检查参数级隐藏（本次无参数级隐藏，跳过）
+4. 执行敏感内容扫描（无命中）
+5. 展示过滤摘要（接口级过滤 1 条，参数级过滤 0 处）
+6. PM 确认后写入快照文件和 latest 文件
+
+**步骤 3 检查要点**
+- [ ] 写入 `outputs/openapi/order-api-public-v1.1.0.yaml`（版本号快照）
+- [ ] 写入或更新 `outputs/openapi/order-api-public.yaml`（latest 文件）
+- [ ] 对外版不含接口级隐藏 endpoint
+- [ ] 内部版 `openapi/order-api.yaml` 未被修改
+- [ ] 过滤摘要分列两类（接口级 / 参数级），各自列出数量

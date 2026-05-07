@@ -269,6 +269,7 @@ DELEGATION_COMMANDS = {"ingest-prd.md"}
 OPTIONAL_CONTEXT_FILES = {
     "domain-checklists.md",   # new-prd / requirement-clarifier / update-prd 中已写"不存在则跳过"
     "pending-flywheel.md",    # sync-docs 中已写"不存在则跳过"
+    "api-registry.md",        # import-openapi 首次运行时自动创建，其他命令已写"不存在则静默跳过"
 }
 
 

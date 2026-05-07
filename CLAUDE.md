@@ -113,6 +113,9 @@
 | `/prd-summary [标题或ID]` | 输出 PRD 的对齐摘要 | 评审前、开发启动前 |
 | `/import-context [内容]` | 导入产品背景/术语/截图等上下文，AI 分类建议后 PM 确认写入 | 初始化或补充 context 文件 |
 | `/backlog [自然语言描述]` | 需求池管理：录入/查看/排序/扫描/排期，自然语言意图路由 | 记录需求想法、管理待办、排期输入 |
+| `/import-openapi [api-name]` | 新建或差异比对更新 OpenAPI 规范（含目录初始化） | 首次建立或导入新版本时 |
+| `/update-openapi [api-name]` | 增量同步 PRD §8.10 接口变更到规范文件 | PRD 更新含接口变更后 |
+| `/export-openapi [api-name] [version?]` | 两阶段过滤 + 敏感扫描，生成对外精简版 | 需对外发布 API 文档时 |
 
 ### 需求分析命令
 
@@ -256,6 +259,11 @@
   → /generate-page-spec [标题]            （PRD → 页面规格卡）
   → /generate-prototype [标题]            （页面规格卡 → 可交互原型）
 
+涉及接口变更
+  → /import-openapi [api-name]           （首次建立规范或导入）
+  → /update-openapi [api-name]           （PRD 更新后同步规范，飞轮自动触发提议）
+  → /export-openapi [api-name] [version] （需对外发布时，经 PM 确认后写入 outputs/openapi/）
+
 评审 & 迭代
   → /prd-summary [标题或ID]              （评审前对齐）
   → /update-prd [标题] [变更描述]         （更新 + 自动存档 + 扫描增量 TODO/OQ 入池）
@@ -371,6 +379,7 @@ PM 中途取消（如"算了"/"不创建了"）→ 停止引导，不创建任�
 | `/update-prd` 变更含新术语/新功能 | 提议同步对应 context 文件 |
 | `/update-prd` 变更完成后 | 扫描新增 TODO/OQ → 提议入需求池（BKL-FLY-002） |
 | `/requirement-clarifier` RDD 完成 / `/new-prd` 状态变化 | 提议更新需求池关联条目状态（BKL-FLY-003） |
+| `/update-prd` 变更完成，§8.10 有实质内容，PRD 在正式区 | 提议运行 `/update-openapi` 同步接口变更（OAPI-FLY-001） |
 
 **读入方向（Context → PRD）——写到对应章节时，按需读取（文件存在时）**：
 
@@ -396,6 +405,7 @@ PM 中途取消（如"算了"/"不创建了"）→ 停止引导，不创建任�
 | 提及产品已有功能模块名称 | `context/product-feature-map.md` |
 | 出现产品专有名词（非通用词）| `context/business-glossary.md` |
 | "优先级"/"策略"/"边界约束"/"这期不做" | `context/product-strategy.md` |
+| "API"/"接口"/"endpoint"/"调用方"/"OpenAPI"/"Swagger" | `context/api-registry.md`（渐进加载，最多读取 2 个关联规范文件） |
 
 **行为约束**：
 - 读取后在输出中直接引用内容，不说「我读取了文件」
