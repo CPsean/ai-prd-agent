@@ -379,7 +379,7 @@ PM 中途取消（如"算了"/"不创建了"）→ 停止引导，不创建任�
 | `/update-prd` 变更含新术语/新功能 | 提议同步对应 context 文件 |
 | `/update-prd` 变更完成后 | 扫描新增 TODO/OQ → 提议入需求池（BKL-FLY-002） |
 | `/requirement-clarifier` RDD 完成 / `/new-prd` 状态变化 | 提议更新需求池关联条目状态（BKL-FLY-003） |
-| `/update-prd` 变更完成，§8.10 有实质内容，PRD 在正式区 | 提议运行 `/update-openapi` 同步接口变更（OAPI-FLY-001） |
+| `/update-prd` 变更完成，§8.10 有实质内容且"是否影响对外文档"列至少一行填"是"，PRD 在正式区 | 提议运行 `/update-openapi` 同步接口变更（OAPI-FLY-001） |
 
 **读入方向（Context → PRD）——写到对应章节时，按需读取（文件存在时）**：
 

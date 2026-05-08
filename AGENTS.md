@@ -4,10 +4,10 @@
 
 | 元数据 | 值 |
 |--------|-----|
-| 基于 template 版本 | v5.7（2026-05-07） |
-| 基于 template 提交 | `f3aa4f7` |
-| 同步日期 | 2026-05-07 |
-| 同步内容摘要 | OpenAPI 文档集成（F-014）：新增 /import-openapi、/update-openapi、/export-openapi；OAPI-FLY-001 飞轮规则；sync-docs SYNC-OAPI-001 接口一致性检查；feature-prd §8.10 模板节 |
+| 基于 template 版本 | v5.7.1（2026-05-08） |
+| 基于 template 提交 | `54cdd39` |
+| 同步日期 | 2026-05-08 |
+| 同步内容摘要 | fix(§8.10)：限定对外 OpenAPI 范围——标题改为「对外 OpenAPI 变更说明」，内部服务调用不填此节；OAPI-FLY-001 飞轮触发增加「是否影响对外文档」二次条件 |
 
 ---
 
