@@ -32,6 +32,8 @@ context/ ──────读入──────▶ PRD 输出质量提升
 | `/update-prd` PRD 变更完成后 | `backlog/requirement-pool.md` | 扫描新增 TODO/OQ → 提议入池（BKL-FLY-002） | 本次变更无新增 TODO/OQ，或需求池不存在 |
 | `/requirement-clarifier` RDD 完成 / `/new-prd` 状态变化 | `backlog/requirement-pool.md` | 检查需求池中是否有关联条目 → 提议更新状态（BKL-FLY-003） | 需求池不存在或无匹配条目 |
 | `/update-prd` 变更完成，且 §8.10 有实质内容（非「不涉及」、非空）**且**"是否影响对外文档"列至少有一行填"是"，且 PRD 在正式区 | `openapi/` 目录 | 检查 `context/api-registry.md` 是否有关联 API：有则输出同步提议（含变更摘要），提示运行 `/update-openapi`；无则提议先运行 `/import-openapi` 初始化规范（OAPI-FLY-001） | PRD 在草稿区；或 §8.10 填「不涉及」或为空；或所有行"是否影响对外文档"均填"否"（仅内部调整）|
+| `/update-prd` 变更完成 或 `/new-prd` PRD 移入正式区，PRD §8 含页面/弹窗/抽屉描述 | `context/screenshots/[模块]/navigation.md` | 扫描 §8 页面描述（不含 §6 验收标准）→ 提取未录入导航图的页面名 → 在输出末尾追加补录建议（CTX-FLY-005）。建议格式：`> **导航图补录建议**：检测到以下页面在 PRD §8 中描述但尚未录入导航图：[页面名]（建议录入模块：[模块名]）\n> 可通过 /import-context 导入对应截图补录。` | PRD §8 无页面相关描述；或 §8 描述的页面已全部在导航图中；导航模块文件不存在时建议注明「导入时将自动初始化」 |
+| `/generate-prototype` 完成，原型已输出至 `outputs/prototypes/[标题]/` | `context/screenshots/*/navigation.md`（含全局索引） | 读取原型页面列表 → 对比导航图节点 → 有缺口时在输出末尾追加缺口提示（CTX-FLY-006）。提示格式：`> **导航图覆盖检查**：以下原型页面尚未在导航图中录入：[列表]\n> 建议通过 /import-context 导入对应截图。`；导航图完全未初始化时：`> 当前尚未建立导航图，建议通过 /import-context 导入截图初始化。` | 所有原型页面均已在导航图中（有节点命中）；无缺口时静默，不输出提示 |
 
 ### 触发规则：什么算"新术语"
 
