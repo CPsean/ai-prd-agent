@@ -295,19 +295,313 @@
 
 ---
 
-## Codex 等效输入（AGENTS.md 适配）
+## TC-OA-11 /import-openapi 忠实导入约束——源文档充足时直接引用原文
 
-> 以下为各 TC 场景在 Codex（AGENTS.md）环境下的等效触发输入，用于 codex-support 分支冒烟测试。
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证字段级三项充足性检查：三项均充足时 AI 直接引用原文写入 yaml，不改写描述、不扩写、不重新分组（对应 AC-12） |
+| **前置条件** | `openapi/` 目录已存在；PM 提供一份结��完整的 yaml 文件（所有 endpoint 有 description、字段名清晰、已按 tag 分组） |
 
-| TC 编号 | Codex 等效输入 |
-|---------|--------------|
-| TC-OA-01 | "导入API规范：OpenAPI文档集成"（openapi/ 目录不存在时触发初始化） |
-| TC-OA-02 | "导入API规范：order-api"→ 选"已有文件"→ 粘贴 yaml 内容 |
-| TC-OA-03 | "导入API规范：OpenAPI文档集成"→ 选"从 PRD §8.10 生成"（§8.10 描述不足时期待追问） |
-| TC-OA-04 | "导入API规范：order-api"→ 提供新版本 yaml（文件已存在时期待差异比对 + 路径选择） |
-| TC-OA-05 | "导入API规范：测试需求"（PRD 仅在 drafts/ 时期待被阻断） |
-| TC-OA-06 | "同步接口变更：order-api"（yaml changelog 已含部分同步记录时期待去重） |
-| TC-OA-07 | "导出API文档：order-api"（_hidden-interfaces.md 含两粒度隐藏时期待分列摘要） |
-| TC-OA-08 | "导出API文档：order-api"（yaml description 含敏感词时期待警告 + 强制确认） |
-| TC-OA-09 | "更新[标题]的PRD：F-014 补充 §8.10 接口响应格式"（更新完成后期待 OAPI-FLY-001 提议） |
-| TC-OA-10 | "分析一下这个需求：需要在订单列表增加批量导出接口，支持按状态筛选"（含"接口"词时期待 api-registry.md 渐进加载） |
+**测试输入**
+```
+/import-openapi esign-api
+（选择"导入已有文件"）
+（提供结构完整的 yaml 文件）
+```
+
+**预期行为**
+1. AI 解析源文档，执行三项充足性检查（描述非空 ✓ / 字段名清晰 ✓ / 分组完整 ✓）
+2. 判定为"三项均充足"
+3. 直接引用原文写入 yaml，不改写任何 description、不扩写说明、不重新分组
+4. 展示接口清单摘要，等待 PM 确认
+
+**检查要点**
+- [ ] 写入的 yaml 中 description 文字与源文档逐字一致（无改写/扩写）
+- [ ] 字段名与源文档完全一致（无重命名）
+- [ ] tag 分组结构与源文档一致（无重新分组）
+- [ ] AI 未追问任何补全问题（三项均充足时不追问）
+
+---
+
+## TC-OA-12 /import-openapi 忠实导入约束——部分不充足时仅追问缺失字段
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证部分不充足时仅对缺失字段追问，已充足内容仍引用原文（对应 AC-12） |
+| **前置条件** | PM 提供的源文档中：description 充足、字段名清晰，但无 tag 分组（所有 endpoint 平铺） |
+
+**测试输入**
+```
+/import-openapi esign-api
+（选择"导入已有文件"）
+（提供无 tag 分组的 yaml 文件）
+```
+
+**预期行为**
+1. AI 执行三项检查：描述非空 ✓ / 字段名清晰 ✓ / 分组完整 ✗
+2. 仅对"分组"追问 PM（如"请确认这些接口的业务分组"），不超过 3 个问题
+3. PM 回答后，按 PM 指定的分组写入 yaml
+4. 已充足的 description 和字段名仍引用原文，不改写
+
+**检查要点**
+- [ ] 追问仅针对不充足项（分组），不追问已充足的描述和字段名
+- [ ] 追问不超过 3 个问题
+- [ ] 写入后 description 与源文档逐字一致（未被改写）
+- [ ] 分组按 PM 回答的方案写入
+
+---
+
+## TC-OA-13 /export-openapi 版本号格式校验——非语义化版本阻断
+
+| ��段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证版本号合法性校验：格式不符合语义化版本时阻断（对应 AC-13） |
+| **前置条件** | `openapi/order-api.yaml` 已存在 |
+
+**测试输入**
+```
+/export-openapi order-api v1
+```
+
+**预期行为**
+1. AI 检测版本号 `v1` 不符合语义化版本格式（应为 X.Y.Z）
+2. 阻断执行，提示 PM 修正格式
+3. 不执行过滤，不写入任何文件
+
+**检查要点**
+- [ ] 非 X.Y.Z 格式的版本号被阻断（如 `v1`、`1.0`、`abc`）
+- [ ] 提示信息说明正确格式要求
+- [ ] 合法格式（如 `1.0.0`、`2.1.3`）正常通过
+
+---
+
+## TC-OA-14 /export-openapi 破坏性变更检测——主版本未升时阻断
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证破坏性变更检测：含破坏性变更但主版本号未升时阻断提示（对应 AC-13） |
+| **前置条件** | `openapi/order-api.yaml` 已存在；上次导出版本为 `1.0.0`；本次 yaml 中删除了一个 endpoint |
+
+**测试输入**
+```
+/export-openapi order-api 1.1.0
+```
+
+**预期行为**
+1. AI 执行过滤后，对比本次与上次导出版本的 diff
+2. 检测到破坏性变更（删除 endpoint）
+3. 版本号从 1.0.0 升至 1.1.0（主版本未变）→ 阻断
+4. 输出警告：检测到破坏性变更，建议调整为 2.0.0
+5. PM 可回复新版本号继续，或回复「强制导出」跳过
+
+**检查要点**
+- [ ] 破坏性变更（删除endpoint/删除必填参数/修改响应结构）被检测到
+- [ ] 主版本未升时阻断，不直接写入
+- [ ] 提供建议版本号和「强制导出」选项
+- [ ] PM 调整版本号后可继续执行
+
+---
+
+## TC-OA-15 /export-openapi MD 联动——选择生成 MD 时基于模板输出
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 MD 联动生成：PM 选"是"时基于模板生成 MD，示例从 yaml example 读取（对应 AC-14） |
+| **前置条件** | `openapi/order-api.yaml` 存在且含 example 字段；`templates/openapi-md-template.md` 存在 |
+
+**测试输入**
+```
+/export-openapi order-api 1.0.0
+（确认过滤摘要后）
+（回复"是"同时生成 MD）
+```
+
+**预期行为**
+1. AI 完成过滤+敏感扫描，PM 确认
+2. 询问"是否同时生成对外 MD 文档？"
+3. PM 回复"是"
+4. AI 读取 `templates/openapi-md-template.md`，基于过滤后 endpoint 集合生成 MD
+5. 示例从 yaml example 字段读取（有则输出，无则留空）
+6. 写入 `outputs/openapi/order-api-public.md`
+
+**检查要点**
+- [ ] MD 中描述文字与 yaml description 逐字一致
+- [ ] MD 中示例与 yaml example 字段一致
+- [ ] yaml 无 example 的 endpoint，MD 对应处留空
+- [ ] 文档末尾有"待补齐示例"汇总（如有缺失）
+- [ ] MD 文件写入路径正确
+
+---
+
+## TC-OA-16 /export-openapi MD 联动——模板不存在时阻断 MD 生成
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 MD 模板不存在时阻断 MD 生成，仅完成 yaml 导出（对应 AC-15） |
+| **前置条件** | `templates/openapi-md-template.md` 不存在（已删除或未创建） |
+
+**测试输入**
+```
+/export-openapi order-api 1.0.0
+（确认过滤摘要后）
+（回复"是"同时生成 MD）
+```
+
+**预期行为**
+1. PM 选择生成 MD
+2. AI 检查模板文件不存在
+3. 提示 PM 创建模板，阻断 MD 生成
+4. 仅完成对外 yaml 导出（正常写入 `outputs/openapi/order-api-public-v1.0.0.yaml`）
+
+**检查要点**
+- [ ] yaml 导出正常完成
+- [ ] MD 未生成（`outputs/openapi/order-api-public.md` 不存在或未更新）
+- [ ] 提示信息说明需要创建模板
+
+---
+
+## TC-OA-17 /update-openapi 反向同步检测——未关联 PRD 的 changelog 条目
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 OAPI-SYNC-001：检测到"直接导入"changelog 条目时输出反向同步提议（对应 AC-16） |
+| **前置条件** | `openapi/order-api.yaml` 头部 changelog 含一条"直接导入，无关联 PRD §8.10 变更记录"（未标记 [synced]） |
+
+**测试输入**
+```
+/update-openapi order-api
+```
+
+**预期行为**
+1. AI 读取 yaml changelog，检测到未关联 PRD 的条目
+2. 输出反向同步提议，列出具体条目
+3. 提供两个选项：「补充」或「跳过」
+4. PM 选「跳过」→ 条目末尾追加 `[synced]` 标记
+5. 继续执行后续 Step 2（changelog 去重 + 未同步条目筛选）
+
+**检查要点**
+- [ ] 检测到"直接导入"条目时输出提议（非静默跳过）
+- [ ] 已标记 `[synced]` 的条目不再重复提议
+- [ ] PM 选「跳过」后条目被标记，后续执行不再提议
+- [ ] 反向同步检测不阻断后续正常同步流程
+
+---
+
+## TC-OA-18 /import-openapi Webhook 识别——含回调事件的源文档
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证导入含 Webhook 的源文档时识别并写入 x-webhooks 扩展（对应 AC-17） |
+| **前置条件** | PM 提供的源文档含 Webhook 回调事件章节（如 ENVELOPE_START、ENVELOPE_FINISH 等事件，含 payload schema） |
+
+**测试输入**
+```
+/import-openapi esign-api
+（选择"导入已有文件"）
+（提供含 webhook 章节的 MD/yaml 文件）
+```
+
+**预期行为**
+1. AI 解析源文档，识别 Webhook 回调事件章节
+2. 将事件写入 yaml `x-webhooks` 扩展（含事件类型、payload schema、示例）
+3. 回调事件中的公共结构提取到 `components/schemas`
+4. 展示摘要时包含 webhook 事件数量
+5. 忠实导入约束适用于 webhook 事件描述
+
+**检查要点**
+- [ ] yaml 中存在 `x-webhooks` 扩展，含正确的事件列表
+- [ ] 每个事件含 payload schema（参数名/类型/描述）
+- [ ] 公共结构（如签署人信息）提取到 `components/schemas` 并通过 $ref 引用
+- [ ] 事件描述与源文档逐字一致（忠实导入）
+- [ ] 摘要中显示 webhook 事件数量
+
+---
+
+## TC-OA-19 /import-openapi 错误码识别——含错误码表的源文档
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证导入含错误码表的源文档时识别并写入 x-error-codes 扩展（对应 AC-18） |
+| **前置条件** | PM 提供的源文档含错误码对应表（如 120001~120025，含错误码/错误信息/错误原因） |
+
+**测试输入**
+```
+/import-openapi esign-api
+（选择"导入已有文件"）
+（提供含错误码表的文件）
+```
+
+**预期行为**
+1. AI 解析源文档，识别错误码表
+2. 将错误码写入 yaml `x-error-codes` 扩展（数组格式，每项含 code/message/reason）
+3. 展示摘要时包含错误码数量
+
+**检查要点**
+- [ ] yaml 中存在 `x-error-codes` 扩展
+- [ ] 每条错误码含 code、message、reason 三个字段
+- [ ] 错误码文字与源文档一致（忠实导入）
+- [ ] 摘要中显示错误码数量
+
+---
+
+## TC-OA-20 /export-openapi Webhook 级过滤——隐藏清单中的事件被移除
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 Webhook 级隐藏：_hidden-interfaces.md 中列出的事件从对外版移除（对应 AC-19） |
+| **前置条件** | `openapi/order-api.yaml` 含 x-webhooks（5 个事件）；`_hidden-interfaces.md` 的"Webhook 级隐藏"表中列出 2 个事件 |
+
+**测试输入**
+```
+/export-openapi order-api 1.0.0
+```
+
+**预期行为**
+1. AI 执行接口级过滤
+2. 执行 Webhook 级过滤：移除隐藏清单中的 2 个事件
+3. 过滤摘要中包含"Webhook 级过滤：2 条"
+4. 对外版 yaml 中 x-webhooks 仅含 3 个事件
+
+**检查要点**
+- [ ] 过滤摘要分列显示 Webhook 级过滤数量
+- [ ] 对外版 x-webhooks 中不含被隐藏的事件
+- [ ] 内部版 yaml 不被修改
+- [ ] 无"Webhook 级隐藏"表时静默跳过
+
+---
+
+## TC-OA-21 /export-openapi MD 生成——包含 Webhook 章节和错误码章节
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证 MD 生成覆盖 webhook+错误码章节，内容从 yaml 读取（对应 AC-20） |
+| **前置条件** | `openapi/order-api.yaml` 含 x-webhooks（3 个事件，过滤后）和 x-error-codes（15 条）；`templates/openapi-md-template.md` 存在 |
+
+**测试输入**
+```
+/export-openapi order-api 1.0.0
+（确认后选择"是"生成 MD）
+```
+
+**预期行为**
+1. MD 文档包含"Webhook 回调事件"章节（事件类型表 + 逐事件参数表）
+2. MD 文档包含"错误码"章节（错误码/错误信息/错误原因 表格）
+3. 内容严格从 yaml x-webhooks 和 x-error-codes 读取
+4. webhook 示例从 yaml example 读取，缺失时留空
+
+**检查要点**
+- [ ] MD 中 Webhook 章节包含事件类型汇总表
+- [ ] MD 中每个事件有回调参数表
+- [ ] MD 中错误码表与 yaml x-error-codes 逐条对齐
+- [ ] 所有文字从 yaml 读取，无 AI 自由发挥内容

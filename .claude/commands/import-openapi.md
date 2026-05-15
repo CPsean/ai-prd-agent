@@ -106,15 +106,38 @@ $ARGUMENTS
 
 1. 提示 PM 提供文件路径或粘贴内容
 2. 解析收到的 yaml/json/Postman Collection 内容
-3. **展示接口清单摘要**（非直接写入），格式如下：
+3. **忠实导入约束（OAPI-IMP-FAITHFUL）**：对源文档执行字段级三项充足性检查：
+   - **描述非空**：endpoint/字段的 description 有实质内容（非空、非占位符如"TODO"）
+   - **字段名清晰**：字段名为有意义的英文命名（如 `orderStatus`），可直接理解语义
+   - **分组完整**：endpoint 已按业务模块/资源分组（如按 tag 或路径前缀），结构清晰
+
+   处理规则：
+   - 三项均充足 → 直接引用原文写入 yaml，不得改写描述、扩写说明、重新分组
+   - 部分不充足 → 仅对不充足字段向 PM 追问（≤3 个问题），已充足内容仍引用原文不动
+   - 全部不充足 → 视为残缺文档，按"从 PRD §8.10 生成"路径处理（追问补全后生成）
+   - **Webhook/错误码同等适用**：webhook 事件描述、回调参数表、错误码 message/reason 同样执行三项检查
+
+4. **Webhook 与错误码识别**：解析源文档中的回调事件/Webhook 章节和错误码表：
+   - Webhook → 写入 yaml `x-webhooks` 扩展（含事件类型、payload schema、示例）
+   - 错误码 → 写入 yaml `x-error-codes` 扩展（数组格式，每项含 code/message/reason）
+   - 回调事件中的公共结构 → 提取到 `components/schemas` 复用（如 WebhookSignerInfo）
+   - 忠实导入约束同样适用于 webhook 事件描述和错误码文字
+   - 源文档无 webhook/错误码章节时静默跳过，不追问
+
+5. **展示接口清单��要**（非直接写入），格式如下：
    ```
-   解析完成，共识别 N 条 endpoint：
-   - GET /v1/xxx — [描述]
-   - POST /v1/yyy — [描述]
-   ...（超过 10 条时省略后续，标注"共 N 条，已展示前 10 条"）
+   解析完成：
+   - REST endpoint：N 条
+     - GET /v1/xxx — [描述]
+     - POST /v1/yyy — [描述]
+     ...（超过 10 条时省略后续，标注"共 N 条，已展示前 10 条"）
+   - Webhook 事件：W 个（如有）
+     - ENVELOPE_START — [描述]
+     - ENVELOPE_FINISH — [描述]
+   - 错误码：E 条（如有）
    ```
-4. **等待 PM 明确确认**（如"确认"/"写入"/"没问题"）后才写入文件
-5. 写入 `openapi/[api-name].yaml`
+6. **等待 PM 明确确认**（如"确认"/"写入"/"没问题"）后才写入文件
+7. 写入 `openapi/[api-name].yaml`
 
 ### A-2b 来源 B：从 PRD §8.10 生成
 

@@ -115,7 +115,7 @@
 | `/backlog [自然语言描述]` | 需求池管理：录入/查看/排序/扫描/排期，自然语言意图路由 | 记录需求想法、管理待办、排期输入 |
 | `/import-openapi [api-name]` | 新建或差异比对更新 OpenAPI 规范（含目录初始化） | 首次建立或导入新版本时 |
 | `/update-openapi [api-name]` | 增量同步 PRD §8.10 接口变更到规范文件 | PRD 更新含接口变更后 |
-| `/export-openapi [api-name] [version?]` | 两阶段过滤 + 敏感扫描，生成对外精简版 | 需对外发布 API 文档时 |
+| `/export-openapi [api-name] [version?]` | 两阶段过滤 + 敏感扫描 + 版本号校验，生成对外精简版（可联动生成 MD） | 需对外发布 API 文档时 |
 
 ### 需求分析命令
 
@@ -380,6 +380,8 @@ PM 中途取消（如"算了"/"不创建了"）→ 停止引导，不创建任�
 | `/update-prd` 变更完成后 | 扫描新增 TODO/OQ → 提议入需求池（BKL-FLY-002） |
 | `/requirement-clarifier` RDD 完成 / `/new-prd` 状态变化 | 提议更新需求池关联条目状态（BKL-FLY-003） |
 | `/update-prd` 变更完成，§8.10 有实质内容且"是否影响对外文档"列至少一行填"是"，PRD 在正式区 | 提议运行 `/update-openapi` 同步接口变更（OAPI-FLY-001） |
+| `/update-prd` 或 `/new-prd` PRD 移入正式区完成，PRD §8 含页面/弹窗描述 | 扫描 §8 识别未录入导航图的新页面 → 在输出末尾追加补录建议（CTX-FLY-005） |
+| `/generate-prototype` 完成 | 对比原型页面列表与导航图节点 → 有缺口时列出未录入页面并提示补录（CTX-FLY-006） |
 
 **读入方向（Context → PRD）——写到对应章节时，按需读取（文件存在时）**：
 
@@ -406,6 +408,8 @@ PM 中途取消（如"算了"/"不创建了"）→ 停止引导，不创建任�
 | 出现产品专有名词（非通用词）| `context/business-glossary.md` |
 | "优先级"/"策略"/"边界约束"/"这期不做" | `context/product-strategy.md` |
 | "API"/"接口"/"endpoint"/"调用方"/"OpenAPI"/"Swagger" | `context/api-registry.md`（渐进加载，最多读取 2 个关联规范文件） |
+| "页面"/"弹窗"/"抽屉"/"界面"/"交互"/"跳转"/"原型" | `context/page-navigation.md`（全局导航索引，静默读取，不向 PM 暴露读取行为） |
+| 对话中出现已在 `context/screenshots/` 下录入的功能模块名称 | `context/screenshots/[模块]/navigation.md`（在全局索引基础上按需加载，同一文件同一对话只读一次） |
 
 **行为约束**：
 - 读取后在输出中直接引用内容，不说「我读取了文件」
