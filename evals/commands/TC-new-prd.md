@@ -688,10 +688,18 @@ B
 
 **检查要点**
 - [ ] AI 输出包含冲突提示和新 ID 说明
-- [ ] `prds/F-010-测试功能X/prd.md` 存在（新 ID 目录）
+- [ ] `prds/F-010-测试功能X/prd.md` 存在（新 ID 目录，而非 F-009）
 - [ ] prd.md frontmatter `id` 字段为 F-010（已更新）
+- [ ] prd.md §1 元数据表格中 `PRD-ID` 行的值为 F-010（正文内容也已更新）
+- [ ] prd.md 正文中不再出现旧 ID F-009（全文替换）
+- [ ] `CHANGELOG.md` 中旧 ID F-009 已替换为 F-010
+- [ ] `rdd.md` 中旧 ID F-009 已替换为 F-010（若 rdd.md 存在）
+- [ ] `fields.md` 中旧 ID F-009 已替换为 F-010（若 fields.md 存在）
+- [ ] `context/api-registry.md` 中"关联 PRD"列的 F-009 已替换为 F-010（若文件存在且有该引用）
+- [ ] `context/page-navigation.md` 中 F-009 已替换为 F-010（若文件存在）
+- [ ] AI 输出的冲突提示中列出了实际更新的文件列表
 - [ ] `prds/_registry.md` 中新行 ID 为 F-010，路径为 `prds/F-010-测试功能X/prd.md`
-- [ ] `drafts/F-009-测试功能X/` **不存在**
+- [ ] `drafts/F-009-测试功能X/` **不存在**（目录已重命名后移入正式区）
 - [ ] `drafts/_draft-registry.md` 中 F-009 条目已删除
 
 ---
@@ -855,3 +863,32 @@ B
 - [ ] `> 详细变更历史见同目录 CHANGELOG.md`（§变更记录章节）
 - [ ] 用户故事章节中 Gherkin 格式的非 blockquote 内容完整
 - [ ] story-card 类型中 `> **As a**` 用户故事 blockquote **保留**（为内容占位，非 AI-ONLY）
+
+---
+
+## TC-NP-30 移入正式区前执行 git fetch 获取远程最新 registry
+
+| 字段 | 内容 |
+|------|------|
+| **状态** | — |
+| **测试目标** | 验证移入正式区时先执行 git fetch，基于远程+本地合并后的 registry 做冲突检测，避免并发 push 导致 ID 重复 |
+| **前置条件** | 有 git 远程仓库；本地 `prds/_registry.md` 无 F-016，但远程���有 F-016（模拟：在远程 registry 中手动插入 F-016 行，本地不同步） |
+
+**测试输入**
+```
+B
+```
+（接 A/B 询问，草稿 ID 为 F-016，选择移入正式区）
+
+**预期行为**
+1. 执行 `git fetch origin` 拉取远程最新状态
+2. 读取远程 `prds/_registry.md`，发现 F-016 已存在
+3. 自动顺延为 F-017，执行全量 ID 替换（同 TC-NP-23 的替换范围）
+4. 输出提示包含"检测到 ID 冲突（F-016 已被占用），已自动调整为 F-017"
+
+**检查要点**
+- [ ] AI 输出中有 git fetch 执行说明（或冲突提示中体现了远程检测）
+- [ ] 冲突基于远程状态检测（本地 registry 无 F-016，但仍触发冲突）
+- [ ] 冲突修复范围与 TC-NP-23 一致（prd.md 全文、CHANGELOG.md、rdd.md、fields.md、目录名）
+- [ ] 若 git fetch 失败（无网络/无远程），AI 输出警告"无法获取远程 registry，仅基于本地状态检测冲突"，但不阻断，继续执行
+- [ ] git fetch 失败时，基于本地 registry 正常完成移入操作
