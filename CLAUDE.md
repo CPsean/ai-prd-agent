@@ -115,7 +115,7 @@
 | `/backlog [自然语言描述]` | 需求池管理：录入/查看/排序/扫描/排期，自然语言意图路由 | 记录需求想法、管理待办、排期输入 |
 | `/import-openapi [api-name]` | 新建或差异比对更新 OpenAPI 规范（含目录初始化） | 首次建立或导入新版本时 |
 | `/update-openapi [api-name]` | 增量同步 PRD §8.10 接口变更到规范文件 | PRD 更新含接口变更后 |
-| `/export-openapi [api-name] [version?]` | 两阶段过滤 + 敏感扫描，生成对外精简版 | 需对外发布 API 文档时 |
+| `/export-openapi [api-name] [version?]` | 两阶段过滤 + 敏感扫描 + 版本号校验，生成对外精简版（可联动生成 MD） | 需对外发布 API 文档时 |
 
 ### 需求分析命令
 
