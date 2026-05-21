@@ -6,11 +6,22 @@
 
 ## 适用场景
 
-以下情况需执行本手册：
+**触发原则：template 框架文件有任何变更即执行同步**，不以变更大小或提交数量为门槛。
 
-- template 分支有新命令、命令逻辑重大变更、或新章节上线
-- codex-support 落后 template **3 个以上提交**，或跨越主要版本（如 v5.x → v6.x）
-- 快速判断方法：`git log template --oneline -1` 获取 template 最新提交，与 AGENTS.md 顶部溯源块的 `基于 template 提交` 对比，哈希不同即需同步
+**框架文件（涉及即同步）**：
+
+| 文件/目录 | 说明 |
+|----------|------|
+| `.claude/commands/*.md`（新增或修改） | 命令逻辑变更直接影响 Codex 行为 |
+| `rules/*.md`（新增或修改） | 质检/飞轮规则影响 AI 输出 |
+| `templates/*.md`（新增或修改） | 模板结构影响生成内容 |
+| `evals/`（新增或修改 TC 文件） | 测试用例需保持跨平台同步 |
+| `CLAUDE.md` | 核心路由和上下文加载逻辑 |
+| `docs/HISTORY.md`、`docs/contributing.md` | 版本记录和贡献规范 |
+
+**跳过条件（同时满足才跳过）**：变更仅涉及私有文件（`prds/`、`drafts/`、`context/`、`backlog/`），无任何框架文件变更。
+
+**快速判断方法**：`git log template --oneline -1` 获取 template 最新提交，与 AGENTS.md 顶部溯源块的 `基于 template 提交` 对比——哈希不同即需同步，不论变更内容大小。
 
 ---
 
