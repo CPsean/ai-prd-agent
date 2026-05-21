@@ -304,31 +304,51 @@ PRD 处于草稿阶段，尚未进入正式区，`prds/_registry.md` 暂不更�
 
 **选 B**：执行以下操作：
 
-0. **质量门禁检查**：读取 `rules/prd-quality-gates.md`，对 `prd.md` 执行全量质检：
+0. **远程 registry 同步**：执行 `git fetch origin` 拉取远程最新状态，然后读取远程最新的 `prds/_registry.md`（`git show origin/main:prds/_registry.md`）与本地版本合并，取两者中同类型（SC/F/E）已用 ID 编号的并集，作为后续冲突检测的基准。
+   - git 命令失败（无网络/无远程）：输出警告"无法获取远程 registry，仅基于本地状态检测冲突，建议 push 前手动确认"，继续执行（不阻断）
+
+0.5. **质量门禁检查**：读取 `rules/prd-quality-gates.md`，对 `prd.md` 执行全量质检：
    - **❌ 必须项未通过**：阻断移入，输出质检报告，提示用户修复后重新确认移入
    - **⚠️ 建议项有警告**：输出质检报告，询问用户是否继续移入（用户确认后继续，拒绝则暂停）
    - **全部通过**：静默继续，不输出质检报告
 
-1. **ID 冲突检测**：读取 `prds/_registry.md`，检查当前草稿 ID 是否已被占用：
-   - **无冲突**：继续
-   - **有冲突**：自动查找同类型下一个可用 ID（同时排除 `prds/_registry.md` 和 `drafts/_draft-registry.md` 中的已用 ID），然后：
-     - 更新 `prd.md` frontmatter 中 `id` 字段为新 ID
-     - 全文替换 `CHANGELOG.md` 中的旧 ID 引用
-     - 将草稿目录从 `drafts/[旧ID]-[标题]/` 重命名为 `drafts/[新ID]-[标题]/`
-     - 输出提示："检测到 ID 冲突（[旧ID] 已被占用），已自动调整为 [新ID]"
+1. **ID 冲突检测**：基于步骤 0 合并后的已用 ID 集合（同时排除 `drafts/_draft-registry.md` 中的已用 ID），检查当前草稿 ID 是否已被占用：
+   - **无冲突**：继续，最终 ID = 草稿 ID
+   - **有冲突**：自动查找同类型下一个可用 ID（同时排除远程+本地 registry 和 draft-registry 中的已用 ID），然后执行以下全量替换（旧 ID → 新 ID）：
 
-2. 将 `drafts/[ID]-[标题]/` 整个目录移动到 `prds/[ID]-[标题]/`
+     a. **更新 `prd.md`**：
+        - frontmatter `id` 字段改为新 ID
+        - §1 元数据表格中 `PRD-ID` 行的值改为新 ID
+        - 全文中所有独立出现的旧 ID 字符串替换为新 ID（词边界匹配，避免误替换含相同字符的其他内容）
 
-3. 确认 `prds/[ID]-[标题]/prd.md` 存在后，删除 `drafts/[ID]-[标题]/` 原目录（若移动操作已清空则跳过；若为复制则删除源目录）
+     b. **更新 `CHANGELOG.md`**：全文替换旧 ID 为新 ID
+
+     c. **更新 `rdd.md`**（若存在）：全文替换旧 ID 为新 ID
+
+     d. **更新 `fields.md`**（若存在）：全文替换旧 ID 为新 ID
+
+     e. **更新 `context/api-registry.md`**（若存在）：在"关联 PRD"列中，将值为旧 ID 的单元格替换为新 ID
+
+     f. **更新 `context/page-navigation.md`**（若存在）：全文替换旧 ID 为新 ID
+
+     g. **重命名草稿目录**：将 `drafts/[旧ID]-[标题]/` 重命名为 `drafts/[新ID]-[标题]/`（在文件内容更新之后执行）
+
+     h. 输出提示："检测到 ID 冲突（[旧ID] 已被占用），已自动调整为 [新ID]，已更新以下文件：[列出实际更新的文件]"
+
+   最终 ID = 无冲突时的草稿 ID，或冲突时自动顺延的新 ID。
+
+2. 将 `drafts/[最终ID]-[标题]/` 整个目录移动到 `prds/[最终ID]-[标题]/`
+
+3. 确认 `prds/[最终ID]-[标题]/prd.md` 存在后，删除 `drafts/[最终ID]-[标题]/` 原目录（若移动操作已清空则跳过；若为复制则删除源目录）
 
 4. 从 `drafts/_draft-registry.md` 删除对应 ID 的预注册条目
 
 5. 在 `prds/_registry.md` 的"活跃 PRD"表格末尾追加：
    ```
-   | [ID] | [标题] | [类型] | draft | prds/[ID]-[标题]/prd.md | [今天日期] |
+   | [最终ID] | [标题] | [类型] | draft | prds/[最终ID]-[标题]/prd.md | [今天日期] |
    ```
 
-6. 告知用户：PRD 已注册至 `prds/[ID]-[标题]/`，状态为 `draft`，草稿目录已清理，可运行 `/prd-summary [标题]` 开始评审准备。
+6. 告知用户：PRD 已注册至 `prds/[最终ID]-[标题]/`，状态为 `draft`，草稿目录已清理，可运行 `/prd-summary [标题]` 开始评审准备。
 
 7. **判断是否涉及页面变更**：读取 `prd.md` 内容，判断本需求是否需要生成页面规格和原型。
 
